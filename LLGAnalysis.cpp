@@ -205,6 +205,11 @@ bool LLGAnalysis::Init() {
     electron_phi = new vector<double>;
     electron_eta = new vector<double>;
     electron_iso = new vector<double>;
+    electron_isVeto = new vector<bool>;
+    electron_isLoose = new vector<bool>;
+    electron_isMedium = new vector<bool>;
+    electron_isTight = new vector<bool>;
+    electron_isHEEP = new vector<bool>;
 
     triggerBits = new vector<int>;
     triggerNames = new vector<string>;
@@ -217,6 +222,7 @@ bool LLGAnalysis::Init() {
     recoJet_const_closestVertex_dz = new vector<vector<double> >;
     recoJet_const_closestVertex_d = new vector<vector<double> >;
     recoJet_const_charge = new vector<vector<int> >;
+    recoJet_isLeptonLike = new vector<bool>;
 
     vertex_x = new vector<double>;
     vertex_y = new vector<double>;
@@ -251,6 +257,11 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoElectron_eta", &electron_eta );
     _inputTree->SetBranchAddress("RecoElectron_phi", &electron_phi );
     _inputTree->SetBranchAddress("RecoElectron_iso", &electron_iso );
+    _inputTree->SetBranchAddress("RecoElectron_isVeto", &electron_isVeto );
+    _inputTree->SetBranchAddress("RecoElectron_isLoose", &electron_isLoose );
+    _inputTree->SetBranchAddress("RecoElectron_isMedium", &electron_isMedium );
+    _inputTree->SetBranchAddress("RecoElectron_isTight", &electron_isTight );
+    _inputTree->SetBranchAddress("RecoElectron_isHEEP", &electron_isHEEP );
     _inputTree->SetBranchAddress("TriggerNames", &triggerNames );
     _inputTree->SetBranchAddress("TriggerBits", &triggerBits );
     _inputTree->SetBranchAddress("RecoJet_pt", &recoJet_pt );
@@ -304,6 +315,11 @@ bool LLGAnalysis::Init() {
     _outputTree->Branch("RecoElectron_eta", &electron_eta );
     _outputTree->Branch("RecoElectron_phi", &electron_phi );
     _outputTree->Branch("RecoElectron_iso", &electron_iso );
+    _outputTree->Branch("RecoElectron_isVeto", &electron_isVeto );
+    _outputTree->Branch("RecoElectron_isLoose", &electron_isLoose );
+    _outputTree->Branch("RecoElectron_isMedium", &electron_isMedium );
+    _outputTree->Branch("RecoElectron_isTight", &electron_isTight );
+    _outputTree->Branch("RecoElectron_isHEEP", &electron_isHEEP );
     _outputTree->Branch("TriggerNames", &triggerNames );
     _outputTree->Branch("TriggerBits", &triggerBits );
     _outputTree->Branch("RecoJet_pt", &recoJet_pt );
@@ -359,7 +375,9 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
 
     if( nEntriesMax < 0 ) nEntriesMax = _inputTree -> GetEntries();
 
-    
+
+    RunObjectID();
+
     if( SELECTION == "SignalRegion" ) SetupSignalRegion();
     else if( SELECTION == "WJetsCR" ) SetupWJetsCR();
     // SETUP YOUR SELECTION HERE
@@ -476,6 +494,7 @@ void LLGAnalysis::FinishRun() {
     delete recoJet_btag_jetProbabilityBJetTags;
     delete recoJet_btag_trackCountingHighPurBJetTags;
     delete recoJet_btag_trackCountingHighEffBJetTags;
+    delete recoJet_isLeptonLike;
     delete muon_px;
     delete muon_py;
     delete muon_pz;
@@ -490,6 +509,11 @@ void LLGAnalysis::FinishRun() {
     delete electron_phi;
     delete electron_eta;
     delete electron_iso;
+    delete electron_isVeto;
+    delete electron_isLoose;
+    delete electron_isMedium;
+    delete electron_isTight;
+    delete electron_isHEEP;
     delete triggerBits;
     delete triggerNames;
     delete recoJet_constVertex_x;

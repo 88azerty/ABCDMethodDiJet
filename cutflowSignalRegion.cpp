@@ -57,7 +57,6 @@ void LLGAnalysis::SignalRegionSelection() {
     int IDXFIRSTCUT = -1;
     int IDXSECONDCUT = -1;
 
-    vector<bool> recoJet_isLeptonLike; 
 
     _cutFlow.at("0_NoCut") += 1;
 
@@ -71,70 +70,12 @@ void LLGAnalysis::SignalRegionSelection() {
     if( !passTrigger ) return; 
     _cutFlow.at("1_Trigger") += 1;
 
-    // identify all jets too close to leptons
-    std::vector<unsigned int> idLeptonLikeJets;
-    for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
-      double jeta = recoJet_eta->at(iJet);
-      double jphi = recoJet_phi->at(iJet);
-      double drMin = 10000;
-      for( unsigned int iEle = 0; iEle < electron_px->size(); ++iEle ) {
-        double pt = sqrt(electron_px->at(iEle)*electron_px->at(iEle) + electron_py->at(iEle)*electron_py->at(iEle));
-        if( pt <= ELECTRON_PT_CUT ) continue;
-        // this is dirty but needs to be done to account for different version of ntuples
-        if( electron_iso->size() > 0) {
-          if( electron_iso->at(iEle) / pt >= 0.15 ) continue;
-        }
-        double eeta = electron_eta->at(iEle);
-        double ephi = electron_phi->at(iEle);
-        double deta = fabs(eeta - jeta);
-        double dphi = fabs( ephi - jphi );
-        if( dphi > M_PI ) dphi = 2*M_PI - dphi;
-        double dr = sqrt( deta*deta + dphi*dphi );
-        if( dr < drMin ) drMin = dr;
-      }
-      for( unsigned int iMuon = 0; iMuon < muon_px->size(); ++iMuon ) {
-        double pt = sqrt(muon_px->at(iMuon)*muon_px->at(iMuon) + muon_py->at(iMuon)*muon_py->at(iMuon));
-        if( pt <= MUON_PT_CUT ) continue;
-        if( muon_iso->size() > 0 ) {
-          if( muon_iso->at(iMuon) / pt  > 0.2 ) continue;
-        }
-        double eeta = muon_eta->at(iMuon);
-        double ephi = muon_phi->at(iMuon);
-        double deta = fabs(eeta - jeta);
-        double dphi = fabs( ephi - jphi );
-        if( dphi > M_PI ) dphi = 2*M_PI - dphi;
-        double dr = sqrt( deta*deta + dphi*dphi );
-        if( dr < drMin ) drMin = dr;
-      }
-      _histograms1D.at("JetLeptonDr").Fill( drMin );
-      if( drMin < 0.4 ) idLeptonLikeJets.push_back(iJet);
-      recoJet_isLeptonLike.push_back( (drMin < 0.4 ) ? true : false );
-    }
-
-
-
     // lepton veto:
-    bool hasMuon = false;
-    for( unsigned int im = 0; im < muon_px->size(); ++im ) {
-        double pt = sqrt(muon_px->at(im)*muon_px->at(im) + muon_py->at(im)*muon_py->at(im));
-        if( muon_iso->size() > 0 ) {
-          if( muon_iso->at(im) / pt  > 0.2 ) continue;
-        }
-        if( pt > MUON_PT_CUT ) hasMuon = true;
-    }
-    if( hasMuon ) return; 
+    if( vetoMuons.size() > 0 ) return; 
     _cutFlow.at("2_MuonVeto") += 1;
         
     
-    bool hasElectron = false;
-    for( unsigned int im = 0; im < electron_px->size(); ++im ) {
-        double pt = sqrt(electron_px->at(im)*electron_px->at(im) + electron_py->at(im)*electron_py->at(im));
-        if( electron_iso->size() > 0 ) {
-          if( electron_iso->at(im) / pt >= 0.15 ) continue;
-        }
-        if( pt > ELECTRON_PT_CUT ) hasElectron = true;
-    }
-    if( hasElectron ) return;
+    if( vetoElectrons.size() > 0 ) return;
     _cutFlow.at("3_ElectronVeto") += 1;
 
 
@@ -152,14 +93,8 @@ void LLGAnalysis::SignalRegionSelection() {
         idJetsToSV.push_back( idx );
     }
         
-    for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
-        bool isLeptonLikeJet = false;
-        for(unsigned int idJet = 0; idJet < idLeptonLikeJets.size(); ++idJet ) {
-          if( idLeptonLikeJets.at(idJet) == iJet ) isLeptonLikeJet = true;
-        }
-        if( isLeptonLikeJet ) continue;
-        if( recoJet_pt->at(iJet) < JET_PT_CUT_SV ) continue;
-        if( fabs(recoJet_eta->at(iJet)) > JET_ETA_CUT ) continue;
+    for( unsigned int iselJet = 0; iselJet < selectedJets.size(); ++iselJet ) {
+        int iJet = selectedJets.at(iselJet);
 
         //calculate jet vertex position:
         unsigned int nCons = 0;
@@ -208,7 +143,6 @@ void LLGAnalysis::SignalRegionSelection() {
       bool hasJetPV = false;
       double leadingJetPt = 0.;
       for( unsigned int iiJet = 0; iiJet < idJetsToPV.at(iPV).size(); ++iiJet ) {
-          if( recoJet_isLeptonLike.at(iiJet) ) continue;
           int iJet = idJetsToPV.at(iPV).at(iiJet);
           if( recoJet_pt->at(iJet) > JET_PT_CUT_PV ) hasJetPV = true;
           if( recoJet_pt->at(iJet) > leadingJetPt ) leadingJetPt = recoJet_pt->at(iJet);
@@ -250,7 +184,6 @@ void LLGAnalysis::SignalRegionSelection() {
         double ptFourthLeadingJetPV = -1;
         bool hasJetPV = false;
         for( unsigned int iiJet = 0; iiJet < idJetsToPV.at(iPV).size(); ++iiJet ) {
-            if( recoJet_isLeptonLike.at(iiJet) ) continue;
             int iJet = idJetsToPV.at(iPV).at(iiJet);
             if( recoJet_pt->at(iJet) > JET_PT_CUT_PV ) hasJetPV = true;
             
