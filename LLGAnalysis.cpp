@@ -60,7 +60,7 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     _outputTree = new TTree( _inputTreeName.c_str(), _inputTreeName.c_str() );
 
     bool foundMetadata = false;
-    ifstream metadataFile( metadataFileName, ios::in );
+    ifstream metadataFile( metadataFileName.c_str(), ios::in );
     while( metadataFile.good() ) {
       string name, xs, ntot;
       metadataFile >> name >> ws >> xs >> ws >> ntot;
@@ -221,11 +221,20 @@ bool LLGAnalysis::Init() {
     vertex_x = new vector<double>;
     vertex_y = new vector<double>;
     vertex_z = new vector<double>;
+    vertex_dx = new vector<double>;
+    vertex_dy = new vector<double>;
+    vertex_dz = new vector<double>;
+    vertex_nTracks = new vector<double>;
+    vertex_pt = new vector<double>;
+    vertex_ndof = new vector<double>;
     secVertex_x = new vector<double>;
     secVertex_y = new vector<double>;
     secVertex_z = new vector<double>;
-    vertex_nTracks = new vector<double>;
-    vertex_pt = new vector<double>;
+    secVertex_dx = new vector<double>;
+    secVertex_dy = new vector<double>;
+    secVertex_dz = new vector<double>;
+    secVertex_pt = new vector<double>;
+    secVertex_ndof = new vector<double>;
     
     // and set the branch addresses
     _inputTree->SetBranchAddress("RecoMuon_px", &muon_px );
@@ -263,11 +272,20 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoVertex_x", &vertex_x );
     _inputTree->SetBranchAddress("RecoVertex_y", &vertex_y );
     _inputTree->SetBranchAddress("RecoVertex_z", &vertex_z );
+    _inputTree->SetBranchAddress("RecoVertex_xError", &vertex_dx );
+    _inputTree->SetBranchAddress("RecoVertex_yError", &vertex_dy );
+    _inputTree->SetBranchAddress("RecoVertex_zError", &vertex_dz );
+    _inputTree->SetBranchAddress("RecoVertex_nTracks", &vertex_nTracks );
+    _inputTree->SetBranchAddress("RecoVertex_pt", &vertex_pt );
+    _inputTree->SetBranchAddress("RecoVertex_ndof", &vertex_ndof );
     _inputTree->SetBranchAddress("RecoSecVertex_x", &secVertex_x );
     _inputTree->SetBranchAddress("RecoSecVertex_y", &secVertex_y );
     _inputTree->SetBranchAddress("RecoSecVertex_z", &secVertex_z );
-    _inputTree->SetBranchAddress("RecoVertex_nTracks", &vertex_nTracks );
-    _inputTree->SetBranchAddress("RecoVertex_pt", &vertex_pt );
+    _inputTree->SetBranchAddress("RecoSecVertex_xError", &secVertex_dx );
+    _inputTree->SetBranchAddress("RecoSecVertex_yError", &secVertex_dy );
+    _inputTree->SetBranchAddress("RecoSecVertex_zError", &secVertex_dz );
+    _inputTree->SetBranchAddress("RecoSecVertex_pt", &secVertex_pt );
+    _inputTree->SetBranchAddress("RecoSecVertex_ndof", &secVertex_ndof );
     _inputTree->SetBranchAddress("MET", &met );
     _inputTree->SetBranchAddress("MET_x", &met_x );
     _inputTree->SetBranchAddress("MET_y", &met_y );
@@ -307,11 +325,20 @@ bool LLGAnalysis::Init() {
     _outputTree->Branch("RecoVertex_x", &vertex_x );
     _outputTree->Branch("RecoVertex_y", &vertex_y );
     _outputTree->Branch("RecoVertex_z", &vertex_z );
+    _outputTree->Branch("RecoVertex_dx", &vertex_dx );
+    _outputTree->Branch("RecoVertex_dy", &vertex_dy );
+    _outputTree->Branch("RecoVertex_dz", &vertex_dz );
+    _outputTree->Branch("RecoVertex_nTracks", &vertex_nTracks );
+    _outputTree->Branch("RecoVertex_pt", &vertex_pt );
+    _outputTree->Branch("RecoVertex_ndof", &vertex_ndof );
     _outputTree->Branch("RecoSecVertex_x", &secVertex_x );
     _outputTree->Branch("RecoSecVertex_y", &secVertex_y );
     _outputTree->Branch("RecoSecVertex_z", &secVertex_z );
-    _outputTree->Branch("RecoVertex_nTracks", &vertex_nTracks );
-    _outputTree->Branch("RecoVertex_pt", &vertex_pt );
+    _outputTree->Branch("RecoSecVertex_pt", &secVertex_pt );
+    _outputTree->Branch("RecoSecVertex_ndof", &secVertex_ndof );
+    _outputTree->Branch("RecoSecVertex_dx", &secVertex_dx );
+    _outputTree->Branch("RecoSecVertex_dy", &secVertex_dy );
+    _outputTree->Branch("RecoSecVertex_dz", &secVertex_dz );
     _outputTree->Branch("MET", &met );
     _outputTree->Branch("MET_x", &met_x );
     _outputTree->Branch("MET_y", &met_y );
@@ -477,11 +504,20 @@ void LLGAnalysis::FinishRun() {
     delete vertex_x;
     delete vertex_y;
     delete vertex_z;
+    delete vertex_dx;
+    delete vertex_dy;
+    delete vertex_dz;
+    delete vertex_nTracks;
+    delete vertex_pt;
+    delete vertex_ndof;
     delete secVertex_x;
     delete secVertex_y;
     delete secVertex_z;
-    delete vertex_nTracks;
-    delete vertex_pt;
+    delete secVertex_dx;
+    delete secVertex_dy;
+    delete secVertex_dz;
+    delete secVertex_ndof;
+    delete secVertex_pt;
 
 } 
 

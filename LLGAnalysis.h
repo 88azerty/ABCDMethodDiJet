@@ -102,11 +102,21 @@ class LLGAnalysis {
         vector<double> *vertex_x;
         vector<double> *vertex_y;
         vector<double> *vertex_z; 
-        vector<double> *secVertex_x;
-        vector<double> *secVertex_y; 
-        vector<double> *secVertex_z; 
         vector<double> *vertex_nTracks; 
         vector<double> *vertex_pt; 
+        vector<double> *vertex_ndof;
+        vector<double> *vertex_dx;
+        vector<double> *vertex_dy;
+        vector<double> *vertex_dz;
+
+        vector<double> *secVertex_x;
+        vector<double> *secVertex_y; 
+        vector<double> *secVertex_z;
+        vector<double> *secVertex_ndof;
+        vector<double> *secVertex_pt;
+        vector<double> *secVertex_dx;
+        vector<double> *secVertex_dy; 
+        vector<double> *secVertex_dz; 
     
         double met;
         double met_x;
