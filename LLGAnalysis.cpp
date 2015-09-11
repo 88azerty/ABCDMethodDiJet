@@ -376,8 +376,6 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
     if( nEntriesMax < 0 ) nEntriesMax = _inputTree -> GetEntries();
 
 
-    RunObjectID();
-
     if( SELECTION == "SignalRegion" ) SetupSignalRegion();
     else if( SELECTION == "WJetsCR" ) SetupWJetsCR();
     // SETUP YOUR SELECTION HERE
@@ -393,7 +391,8 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         //cout << "====================" << endl;
 
         _inputTree->GetEntry(i);
-        
+       
+        RunObjectID(); 
         FillEfficiencyHistograms();
 
         if( SELECTION == "SignalRegion" ) SignalRegionSelection();
