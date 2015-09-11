@@ -72,7 +72,6 @@ void LLGAnalysis::RunObjectID() {
     }
 
     // now fill the signal jets:
-    std::cout << "now looking over " << recoJet_pt->size() << " jets " << std::endl;
     for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
         if( recoJet_isLeptonLike->at(iJet) ) continue;
         //if( recoJet_pt->at(iJet) < JET_PT_CUT_SV ) continue;
