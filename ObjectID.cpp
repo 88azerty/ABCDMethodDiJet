@@ -27,7 +27,6 @@ void LLGAnalysis::RunObjectID() {
     for( unsigned int ie = 0; ie < electron_px->size(); ++ie ) {
         double pt = sqrt(electron_px->at(ie)*electron_px->at(ie) + electron_py->at(ie)*electron_py->at(ie));
         if( pt < ELECTRON_PT_CUT ) continue;
-
         if( electron_isVeto->at(ie) )   vetoElectrons.push_back(ie);
         if( electron_isLoose->at(ie) )  looseElectrons.push_back(ie);
         if( electron_isMedium->at(ie) ) mediumElectrons.push_back(ie);
@@ -67,14 +66,12 @@ void LLGAnalysis::RunObjectID() {
       }
 
       // and fill the recoJet variable:
-      _histograms1D.at("JetLeptonDr").Fill( drMin );
       recoJet_isLeptonLike->push_back( (drMin < 0.4 ) ? true : false );
     }
 
     // now fill the signal jets:
     for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
         if( recoJet_isLeptonLike->at(iJet) ) continue;
-        //if( recoJet_pt->at(iJet) < JET_PT_CUT_SV ) continue;
         if( fabs(recoJet_eta->at(iJet)) > JET_ETA_CUT ) continue;
         selectedJets.push_back(iJet);
     }

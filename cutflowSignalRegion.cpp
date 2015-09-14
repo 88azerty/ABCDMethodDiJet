@@ -121,7 +121,9 @@ void LLGAnalysis::SignalRegionSelection() {
                 fabs(position.at(2) - secVertex_z->at(iVtx) ) < 1.e-10 ) {
                 
                 nJetsToSV.at(iVtx) += 1;
-                idJetsToSV.at(iVtx).push_back( iJet );
+                if( recoJet_pt->at(iJet) > JET_PT_CUT_SV ) { 
+                    idJetsToSV.at(iVtx).push_back( iJet );
+                }
                 nMatch += 1;
 
             }
