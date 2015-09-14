@@ -1,4 +1,6 @@
 TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola   831.76      25446993
+WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8      61526.7       24151270
+TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8            831.76      42730273
 TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola                  0.5085    199700
 TTWJets_Tune4C_13TeV-madgraph-tauola                        1.152     246521
 TTZJets_Tune4C_13TeV-madgraph-tauola                        2.232     249275
