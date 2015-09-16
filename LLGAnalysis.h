@@ -36,6 +36,8 @@ class LLGAnalysis {
     private:
         static LLGAnalysis* _instance;
 
+        void RunObjectID();
+
         void makeHist( string nametitle, int nbinsx, double xmin, double xmax, int nbinsy, double ymin, double ymax, string xtitle, string ytitle, string ztitle, string drawOption = "", double xAxisOffset = 1., double yAxisOffset = 1.2, double zAxisOffset = 1. ); 
         void makeHist( string nametitle, int nbins, double xmin, double xmax, string xtitle, string ytitle, string drawOption = "", double xAxisOffset = 1., double yAxisOffset = 1.2 );
         void setStyle(double ytoff = 1.0, bool marker = true, double left_margin = 0.15); 
@@ -88,6 +90,11 @@ class LLGAnalysis {
         vector<double> *electron_phi; 
         vector<double> *electron_eta; 
         vector<double> *electron_iso;
+        vector<bool> *electron_isVeto;
+        vector<bool> *electron_isLoose;
+        vector<bool> *electron_isMedium;
+        vector<bool> *electron_isTight;
+        vector<bool> *electron_isHEEP;
         vector<int> *triggerBits; 
         vector<string> *triggerNames; 
         vector<vector<double> > *recoJet_constVertex_x; 
@@ -98,6 +105,7 @@ class LLGAnalysis {
         vector<vector<double> > *recoJet_const_closestVertex_dz; 
         vector<vector<double> > *recoJet_const_closestVertex_d;
         vector<vector<int> > *recoJet_const_charge; 
+        vector<bool> *recoJet_isLeptonLike;
 
         vector<double> *vertex_x;
         vector<double> *vertex_y;
@@ -117,7 +125,16 @@ class LLGAnalysis {
         vector<double> *secVertex_dx;
         vector<double> *secVertex_dy; 
         vector<double> *secVertex_dz; 
-    
+
+        
+        vector<int> vetoElectrons;
+        vector<int> looseElectrons;
+        vector<int> mediumElectrons;
+        vector<int> tightElectrons;
+        vector<int> heepElectrons;
+        vector<int> vetoMuons;
+        vector<int> selectedJets;
+
         double met;
         double met_x;
         double met_y;
