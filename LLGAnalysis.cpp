@@ -267,11 +267,11 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_pt", &recoJet_pt );
     _inputTree->SetBranchAddress("RecoJet_eta", &recoJet_eta );
     _inputTree->SetBranchAddress("RecoJet_phi", &recoJet_phi );
-    _inputTree->SetBranchAddress("RecoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags", &recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags );
-    _inputTree->SetBranchAddress("RecoJet_btag_jetBProbabilityBJetTags", &recoJet_btag_jetBProbabilityBJetTags );
-    _inputTree->SetBranchAddress("RecoJet_btag_jetProbabilityBJetTags", &recoJet_btag_jetProbabilityBJetTags );
-    _inputTree->SetBranchAddress("RecoJet_btag_trackCountingHighPurBJetTags", &recoJet_btag_trackCountingHighPurBJetTags );
-    _inputTree->SetBranchAddress("RecoJet_btag_trackCountingHighEffBJetTags", &recoJet_btag_trackCountingHighEffBJetTags );
+    _inputTree->SetBranchAddress("RecoJet_btag_pfCombinedInclusiveSecondaryVertexV2BJetTags", &recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags );
+    _inputTree->SetBranchAddress("RecoJet_btag_pfJetBProbabilityBJetTags", &recoJet_btag_jetBProbabilityBJetTags );
+    _inputTree->SetBranchAddress("RecoJet_btag_pfJetProbabilityBJetTags", &recoJet_btag_jetProbabilityBJetTags );
+    _inputTree->SetBranchAddress("RecoJet_btag_pfTrackCountingHighPurBJetTags", &recoJet_btag_trackCountingHighPurBJetTags );
+    _inputTree->SetBranchAddress("RecoJet_btag_pfTrackCountingHighEffBJetTags", &recoJet_btag_trackCountingHighEffBJetTags );
     _inputTree->SetBranchAddress("RecoJet_constVertex_x", &recoJet_constVertex_x );
     _inputTree->SetBranchAddress("RecoJet_constVertex_y", &recoJet_constVertex_y );
     _inputTree->SetBranchAddress("RecoJet_constVertex_z", &recoJet_constVertex_z );
