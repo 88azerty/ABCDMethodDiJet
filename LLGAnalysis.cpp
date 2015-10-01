@@ -189,7 +189,10 @@ bool LLGAnalysis::Init() {
     recoJet_phi = new vector<double>;
     recoJet_eta = new vector<double>;
     recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags = new vector<double>;
-    
+    recoJet_vertex_x = new vector<double>;
+    recoJet_vertex_y = new vector<double>;
+    recoJet_vertex_z = new vector<double>;
+
     muon_px = new vector<double>;
     muon_py = new vector<double>;
     muon_pz = new vector<double>;
@@ -213,7 +216,7 @@ bool LLGAnalysis::Init() {
 
     triggerBits = new vector<int>;
     triggerNames = new vector<string>;
-    
+    /* 
     recoJet_constVertex_x = new vector<vector<double> >;
     recoJet_constVertex_y = new vector<vector<double> >;
     recoJet_constVertex_z = new vector<vector<double> >;
@@ -222,8 +225,8 @@ bool LLGAnalysis::Init() {
     recoJet_const_closestVertex_dz = new vector<vector<double> >;
     recoJet_const_closestVertex_d = new vector<vector<double> >;
     recoJet_const_charge = new vector<vector<int> >;
+    */
     recoJet_isLeptonLike = new vector<bool>;
-
     vertex_x = new vector<double>;
     vertex_y = new vector<double>;
     vertex_z = new vector<double>;
@@ -272,6 +275,10 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_btag_pfJetProbabilityBJetTags", &recoJet_btag_jetProbabilityBJetTags );
     _inputTree->SetBranchAddress("RecoJet_btag_pfTrackCountingHighPurBJetTags", &recoJet_btag_trackCountingHighPurBJetTags );
     _inputTree->SetBranchAddress("RecoJet_btag_pfTrackCountingHighEffBJetTags", &recoJet_btag_trackCountingHighEffBJetTags );
+    _inputTree->SetBranchAddress("RecoJet_Vertex_x", &recoJet_vertex_x );
+    _inputTree->SetBranchAddress("RecoJet_Vertex_y", &recoJet_vertex_y );
+    _inputTree->SetBranchAddress("RecoJet_Vertex_z", &recoJet_vertex_z );
+    /*
     _inputTree->SetBranchAddress("RecoJet_constVertex_x", &recoJet_constVertex_x );
     _inputTree->SetBranchAddress("RecoJet_constVertex_y", &recoJet_constVertex_y );
     _inputTree->SetBranchAddress("RecoJet_constVertex_z", &recoJet_constVertex_z );
@@ -280,6 +287,7 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_dxy", &recoJet_const_closestVertex_dxy );
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_dz", &recoJet_const_closestVertex_dz );
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
+    */
     _inputTree->SetBranchAddress("RecoVertex_x", &vertex_x );
     _inputTree->SetBranchAddress("RecoVertex_y", &vertex_y );
     _inputTree->SetBranchAddress("RecoVertex_z", &vertex_z );
@@ -330,6 +338,7 @@ bool LLGAnalysis::Init() {
     _outputTree->Branch("RecoJet_btag_jetProbabilityBJetTags", &recoJet_btag_jetProbabilityBJetTags );
     _outputTree->Branch("RecoJet_btag_trackCountingHighPurBJetTags", &recoJet_btag_trackCountingHighPurBJetTags );
     _outputTree->Branch("RecoJet_btag_trackCountingHighEffBJetTags", &recoJet_btag_trackCountingHighEffBJetTags );
+    /*
     _outputTree->Branch("RecoJet_constVertex_x", &recoJet_constVertex_x );
     _outputTree->Branch("RecoJet_constVertex_y", &recoJet_constVertex_y );
     _outputTree->Branch("RecoJet_constVertex_z", &recoJet_constVertex_z );
@@ -338,6 +347,7 @@ bool LLGAnalysis::Init() {
     _outputTree->Branch("RecoJet_const_closestVertex_dxy", &recoJet_const_closestVertex_dxy );
     _outputTree->Branch("RecoJet_const_closestVertex_dz", &recoJet_const_closestVertex_dz );
     _outputTree->Branch("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
+    */
     _outputTree->Branch("RecoVertex_x", &vertex_x );
     _outputTree->Branch("RecoVertex_y", &vertex_y );
     _outputTree->Branch("RecoVertex_z", &vertex_z );
@@ -389,9 +399,8 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         
         cout << "NOW RUNNING EVENT " << i << "\r"; fflush(stdout);
         //cout << "====================" << endl;
-
+    
         _inputTree->GetEntry(i);
-       
         RunObjectID(); 
         FillEfficiencyHistograms();
 
@@ -494,6 +503,9 @@ void LLGAnalysis::FinishRun() {
     delete recoJet_btag_trackCountingHighPurBJetTags;
     delete recoJet_btag_trackCountingHighEffBJetTags;
     delete recoJet_isLeptonLike;
+    delete recoJet_vertex_x;
+    delete recoJet_vertex_y;
+    delete recoJet_vertex_z;
     delete muon_px;
     delete muon_py;
     delete muon_pz;
@@ -515,6 +527,7 @@ void LLGAnalysis::FinishRun() {
     delete electron_isHEEP;
     delete triggerBits;
     delete triggerNames;
+    /*
     delete recoJet_constVertex_x;
     delete recoJet_constVertex_y;
     delete recoJet_constVertex_z;
@@ -523,7 +536,7 @@ void LLGAnalysis::FinishRun() {
     delete recoJet_const_closestVertex_dz;
     delete recoJet_const_closestVertex_d;
     delete recoJet_const_charge;
-
+    */
     delete vertex_x;
     delete vertex_y;
     delete vertex_z;

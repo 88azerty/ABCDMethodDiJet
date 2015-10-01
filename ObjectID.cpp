@@ -2,6 +2,7 @@
 
 void LLGAnalysis::RunObjectID() {
 
+
     vetoElectrons.clear();
     looseElectrons.clear();
     mediumElectrons.clear();
@@ -9,9 +10,7 @@ void LLGAnalysis::RunObjectID() {
     heepElectrons.clear();
     vetoMuons.clear();
     selectedJets.clear();
-
     recoJet_isLeptonLike->clear();
-
     // first the muons 
     for( unsigned int im = 0; im < muon_px->size(); ++im ) {
         double pt = sqrt(muon_px->at(im)*muon_px->at(im) + muon_py->at(im)*muon_py->at(im));
@@ -22,7 +21,7 @@ void LLGAnalysis::RunObjectID() {
         
         vetoMuons.push_back(im);
     }
-
+    
     // now the electrons
     for( unsigned int ie = 0; ie < electron_px->size(); ++ie ) {
         double pt = sqrt(electron_px->at(ie)*electron_px->at(ie) + electron_py->at(ie)*electron_py->at(ie));

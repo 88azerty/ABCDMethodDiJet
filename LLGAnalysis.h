@@ -76,6 +76,9 @@ class LLGAnalysis {
         vector<double> *recoJet_btag_jetProbabilityBJetTags;
         vector<double> *recoJet_btag_trackCountingHighPurBJetTags;
         vector<double> *recoJet_btag_trackCountingHighEffBJetTags;
+        vector<double> *recoJet_vertex_x;
+        vector<double> *recoJet_vertex_y;
+        vector<double> *recoJet_vertex_z;
         vector<double> *muon_px; 
         vector<double> *muon_py; 
         vector<double> *muon_pz; 
@@ -97,6 +100,7 @@ class LLGAnalysis {
         vector<bool> *electron_isHEEP;
         vector<int> *triggerBits; 
         vector<string> *triggerNames; 
+        /*
         vector<vector<double> > *recoJet_constVertex_x; 
         vector<vector<double> > *recoJet_constVertex_y; 
         vector<vector<double> > *recoJet_constVertex_z; 
@@ -105,6 +109,7 @@ class LLGAnalysis {
         vector<vector<double> > *recoJet_const_closestVertex_dz; 
         vector<vector<double> > *recoJet_const_closestVertex_d;
         vector<vector<int> > *recoJet_const_charge; 
+        */
         vector<bool> *recoJet_isLeptonLike;
 
         vector<double> *vertex_x;

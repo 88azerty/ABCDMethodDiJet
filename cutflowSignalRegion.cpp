@@ -96,12 +96,13 @@ void LLGAnalysis::SignalRegionSelection() {
 
     for( unsigned int iselJet = 0; iselJet < selectedJets.size(); ++iselJet ) {
         int iJet = selectedJets.at(iselJet);
-
         //calculate jet vertex position:
-        unsigned int nCons = 0;
-        double weightednCons = 0.;
-        vector<double> error(3,0.);
-        vector<double> position = CalculateVertex( recoJet_constVertex_x->at(iJet), recoJet_constVertex_y->at(iJet), recoJet_constVertex_z->at(iJet), recoJet_const_pt->at(iJet), recoJet_const_charge->at(iJet), recoJet_const_closestVertex_d->at(iJet), nCons, weightednCons, error );
+        //vector<double> error(3,0.);
+        vector<double> position(3,0.);
+        position.at(0) = recoJet_vertex_x->at(iJet);
+        position.at(1) = recoJet_vertex_y->at(iJet);
+        position.at(2) = recoJet_vertex_z->at(iJet);
+        //vector<double> position = CalculateVertex( recoJet_constVertex_x->at(iJet), recoJet_constVertex_y->at(iJet), recoJet_constVertex_z->at(iJet), recoJet_const_pt->at(iJet), recoJet_const_charge->at(iJet), recoJet_const_closestVertex_d->at(iJet), nCons, weightednCons, error );
         int nMatch = 0;
         
         //std::cout << "this is jet # " << iJet << " at position " << position.at(0) << " " << position.at(1) << " " << position.at(2) << std::endl; 
