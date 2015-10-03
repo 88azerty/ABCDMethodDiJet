@@ -484,7 +484,7 @@ void LLGAnalysis::FinishRun() {
     _outputTree->Write();
     _outputFile->Close();
 
-  
+    /* 
     cout << "PRINTING 2D OPTIMISATION MATRIX : " << endl;
     for( unsigned int i = 0; i < _yields2DOptimisation.size(); ++i ) {
       for( unsigned int j = 0; j < _yields2DOptimisation.at(i).size(); ++j ) {
@@ -492,6 +492,7 @@ void LLGAnalysis::FinishRun() {
       }
       cout << endl;
     }
+    */
 
     delete _inputTree;
     delete recoJet_pt;
