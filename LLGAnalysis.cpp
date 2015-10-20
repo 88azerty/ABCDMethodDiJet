@@ -383,30 +383,30 @@ bool LLGAnalysis::Init() {
       _inputTree->GetEntry(0);
       for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
         _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
-        _RT_outputTree->Branch("MET", &met );
-        _RT_outputTree->Branch("nVetoElectrons", &_RT_nVetoElectrons );
-        _RT_outputTree->Branch("nLooseElectrons", &_RT_nLooseElectrons );
-        _RT_outputTree->Branch("nMediumElectrons", &_RT_nMediumElectrons );
-        _RT_outputTree->Branch("nTightElectrons", &_RT_nTightElectrons );
-        _RT_outputTree->Branch("nVetoMuons", &_RT_nVetoMuons );
-        _RT_outputTree->Branch("nTightMuons", &_RT_nTightMuons );
-        _RT_outputTree->Branch("nJets10", &_RT_nJets10 );
-        _RT_outputTree->Branch("nJets20", &_RT_nJets20 );
-        _RT_outputTree->Branch("nJets30", &_RT_nJets30 );
-        _RT_outputTree->Branch("nLooseBJets10", &_RT_nLooseBJets10 );
-        _RT_outputTree->Branch("nLooseBJets20", &_RT_nLooseBJets20 );
-        _RT_outputTree->Branch("nLooseBJets30", &_RT_nLooseBJets30 );
-        _RT_outputTree->Branch("nMediumBJets10", &_RT_nMediumBJets10 );
-        _RT_outputTree->Branch("nMediumBJets20", &_RT_nMediumBJets20 );
-        _RT_outputTree->Branch("nMediumBJets30", &_RT_nMediumBJets30 );
-        _RT_outputTree->Branch("nTightBJets10", &_RT_nTightBJets10 );
-        _RT_outputTree->Branch("nTightBJets20", &_RT_nTightBJets20 );
-        _RT_outputTree->Branch("nTightBJets30", &_RT_nTightBJets30 );
-        _RT_outputTree->Branch("nSVWith2Jets", &_RT_nSVWith2Jets );
-        _RT_outputTree->Branch("PVLeadingJet_pt", &_RT_PV_LeadingJetPt );
-        _RT_outputTree->Branch("SVHighestDiJetMass", &_RT_SV_LeadingDiJetMass );
-        _RT_outputTree->Branch("EventWeight", &evtWeight );
       }
+      _RT_outputTree->Branch("MET", &met );
+      _RT_outputTree->Branch("nVetoElectrons", &_RT_nVetoElectrons );
+      _RT_outputTree->Branch("nLooseElectrons", &_RT_nLooseElectrons );
+      _RT_outputTree->Branch("nMediumElectrons", &_RT_nMediumElectrons );
+      _RT_outputTree->Branch("nTightElectrons", &_RT_nTightElectrons );
+      _RT_outputTree->Branch("nVetoMuons", &_RT_nVetoMuons );
+      _RT_outputTree->Branch("nTightMuons", &_RT_nTightMuons );
+      _RT_outputTree->Branch("nJets10", &_RT_nJets10 );
+      _RT_outputTree->Branch("nJets20", &_RT_nJets20 );
+      _RT_outputTree->Branch("nJets30", &_RT_nJets30 );
+      _RT_outputTree->Branch("nLooseBJets10", &_RT_nLooseBJets10 );
+      _RT_outputTree->Branch("nLooseBJets20", &_RT_nLooseBJets20 );
+      _RT_outputTree->Branch("nLooseBJets30", &_RT_nLooseBJets30 );
+      _RT_outputTree->Branch("nMediumBJets10", &_RT_nMediumBJets10 );
+      _RT_outputTree->Branch("nMediumBJets20", &_RT_nMediumBJets20 );
+      _RT_outputTree->Branch("nMediumBJets30", &_RT_nMediumBJets30 );
+      _RT_outputTree->Branch("nTightBJets10", &_RT_nTightBJets10 );
+      _RT_outputTree->Branch("nTightBJets20", &_RT_nTightBJets20 );
+      _RT_outputTree->Branch("nTightBJets30", &_RT_nTightBJets30 );
+      _RT_outputTree->Branch("nSVWith2Jets", &_RT_nSVWith2Jets );
+      _RT_outputTree->Branch("PVLeadingJet_pt", &_RT_PV_LeadingJetPt );
+      _RT_outputTree->Branch("SVHighestDiJetMass", &_RT_SV_LeadingDiJetMass );
+      _RT_outputTree->Branch("EventWeight", &evtWeight );
     }
 
 
@@ -523,11 +523,11 @@ void LLGAnalysis::FinishRun() {
     }
     fHistOutput->Close();
 
-    gDirectory = _outputFile;
+    _outputFile->cd();
     _outputTree->Write();
     _outputFile->Close();
     if( SELECTION == "MakeROOTTrees" ) {
-      gDirectory = _RT_outputFile;
+      _RT_outputFile->cd();
       _RT_outputTree->Write();
       _RT_outputFile->Close();
     }

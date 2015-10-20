@@ -26,7 +26,7 @@ void LLGAnalysis::MakeROOTTreesSelection() {
     _RT_nTightBJets30 = 0;
     _RT_nSVWith2Jets = 0;
     _RT_PV_LeadingJetPt = 0.;
-    _RT_SV_LeadingDiJetMass = 10000.;
+    _RT_SV_LeadingDiJetMass = 0.;
 
     _RT_nVetoElectrons = vetoElectrons.size();
     _RT_nLooseElectrons = looseElectrons.size();
