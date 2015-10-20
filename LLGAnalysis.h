@@ -48,6 +48,8 @@ class LLGAnalysis {
         void SignalRegionSelection();
         void SetupWJetsCR();
         void WJetsCRSelection();
+        void SetupMakeROOTTrees();
+        void MakeROOTTreesSelection();
         // INSERT YOUR SELECTION HERE
 
 
@@ -64,10 +66,14 @@ class LLGAnalysis {
         string                  _inputTreeName;
         TChain                  *_inputTree;
         string                  _outputFileName;
+        string                  _RT_outputFileName;
         TTree                   *_outputTree;
         TFile                   *_outputFile;
+        TTree                   *_RT_outputTree;
+        TFile                   *_RT_outputFile;
         bool                    _writeOutputTree;
 
+        // variables for the 'normal' output trees
         vector<double> *recoJet_pt; 
         vector<double> *recoJet_phi; 
         vector<double> *recoJet_eta; 
@@ -138,12 +144,37 @@ class LLGAnalysis {
         vector<int> tightElectrons;
         vector<int> heepElectrons;
         vector<int> vetoMuons;
+        vector<int> tightMuons;
         vector<int> selectedJets;
 
         double met;
         double met_x;
         double met_y;
+      
 
+
+        // variables for ROOT trees
+        int               _RT_nVetoElectrons;
+        int               _RT_nLooseElectrons;
+        int               _RT_nMediumElectrons;
+        int               _RT_nTightElectrons;
+        int               _RT_nVetoMuons;
+        int               _RT_nTightMuons;
+        int               _RT_nJets10;
+        int               _RT_nJets20;
+        int               _RT_nJets30;
+        int               _RT_nLooseBJets10;
+        int               _RT_nLooseBJets20;
+        int               _RT_nLooseBJets30;
+        int               _RT_nMediumBJets10;
+        int               _RT_nMediumBJets20;
+        int               _RT_nMediumBJets30;
+        int               _RT_nTightBJets10;
+        int               _RT_nTightBJets20;
+        int               _RT_nTightBJets30;
+        int               _RT_nSVWith2Jets;
+        double            _RT_PV_LeadingJetPt;
+        double            _RT_SV_LeadingDiJetMass;
 
         double evtWeight;
         double JET_PT_CUT_SV;

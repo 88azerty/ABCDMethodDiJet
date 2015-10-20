@@ -20,6 +20,9 @@ void LLGAnalysis::RunObjectID() {
         if( pt < MUON_PT_CUT ) continue;
         
         vetoMuons.push_back(im);
+        if( muon_isTightMuon->at(im) ) tightMuons.push_back(im);
+      
+
     }
     
     // now the electrons

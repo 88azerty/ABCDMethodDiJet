@@ -56,8 +56,15 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         if( key == "MJJ_CUT"           ) MJJ_CUT = atof(value.c_str());
     }
     _outputFileName = datasetName + "_tree.root";
+    _RT_outputFileName = datasetName + "_ROOTTree.root";
     _outputFile = new TFile( _outputFileName.c_str(), "RECREATE" );
     _outputTree = new TTree( _inputTreeName.c_str(), _inputTreeName.c_str() );
+
+    // create ROOT tree only if signal region is ROOTTree
+    if( SELECTION == "MakeROOTTrees" ) {
+      _RT_outputFile = new TFile( _RT_outputFileName.c_str(), "RECREATE" );
+      _RT_outputTree = new TTree("HistFitterTree", "HistFitterTree" );
+    }
 
     bool foundMetadata = false;
     ifstream metadataFile( metadataFileName.c_str(), ios::in );
@@ -167,7 +174,8 @@ void LLGAnalysis::makeHist( string nametitle, int nbins, double xmin, double xma
 }
 
 bool LLGAnalysis::Init() {
-    
+   
+
     gROOT->ProcessLine(".L Loader.C+");
     gROOT->ProcessLine("#include <vector>");
     gSystem->Load("Loader_C.so");
@@ -308,7 +316,8 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("MET", &met );
     _inputTree->SetBranchAddress("MET_x", &met_x );
     _inputTree->SetBranchAddress("MET_y", &met_y );
-    
+   
+
     _outputTree->Branch("RecoMuon_px", &muon_px );
     _outputTree->Branch("RecoMuon_py", &muon_py );
     _outputTree->Branch("RecoMuon_pz", &muon_pz );
@@ -369,6 +378,37 @@ bool LLGAnalysis::Init() {
     _outputTree->Branch("MET_x", &met_x );
     _outputTree->Branch("MET_y", &met_y );
   
+    // ROOT Trees:
+    if( SELECTION == "MakeROOTTrees" && _inputTree->GetEntries() > 0 ) { 
+      _inputTree->GetEntry(0);
+      for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
+        _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
+        _RT_outputTree->Branch("MET", &met );
+        _RT_outputTree->Branch("nVetoElectrons", &_RT_nVetoElectrons );
+        _RT_outputTree->Branch("nLooseElectrons", &_RT_nLooseElectrons );
+        _RT_outputTree->Branch("nMediumElectrons", &_RT_nMediumElectrons );
+        _RT_outputTree->Branch("nTightElectrons", &_RT_nTightElectrons );
+        _RT_outputTree->Branch("nVetoMuons", &_RT_nVetoMuons );
+        _RT_outputTree->Branch("nTightMuons", &_RT_nTightMuons );
+        _RT_outputTree->Branch("nJets10", &_RT_nJets10 );
+        _RT_outputTree->Branch("nJets20", &_RT_nJets20 );
+        _RT_outputTree->Branch("nJets30", &_RT_nJets30 );
+        _RT_outputTree->Branch("nLooseBJets10", &_RT_nLooseBJets10 );
+        _RT_outputTree->Branch("nLooseBJets20", &_RT_nLooseBJets20 );
+        _RT_outputTree->Branch("nLooseBJets30", &_RT_nLooseBJets30 );
+        _RT_outputTree->Branch("nMediumBJets10", &_RT_nMediumBJets10 );
+        _RT_outputTree->Branch("nMediumBJets20", &_RT_nMediumBJets20 );
+        _RT_outputTree->Branch("nMediumBJets30", &_RT_nMediumBJets30 );
+        _RT_outputTree->Branch("nTightBJets10", &_RT_nTightBJets10 );
+        _RT_outputTree->Branch("nTightBJets20", &_RT_nTightBJets20 );
+        _RT_outputTree->Branch("nTightBJets30", &_RT_nTightBJets30 );
+        _RT_outputTree->Branch("nSVWith2Jets", &_RT_nSVWith2Jets );
+        _RT_outputTree->Branch("PVLeadingJet_pt", &_RT_PV_LeadingJetPt );
+        _RT_outputTree->Branch("SVHighestDiJetMass", &_RT_SV_LeadingDiJetMass );
+        _RT_outputTree->Branch("EventWeight", &evtWeight );
+      }
+    }
+
 
     // crate eps, png and pdf in the end
     _plotFormats.push_back(".eps");
@@ -382,12 +422,14 @@ bool LLGAnalysis::Init() {
 }
 
 void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
-
+  
+    std::cout << "RUnning event loop for selection " << SELECTION << endl;
     if( nEntriesMax < 0 ) nEntriesMax = _inputTree -> GetEntries();
-
+  
 
     if( SELECTION == "SignalRegion" ) SetupSignalRegion();
     else if( SELECTION == "WJetsCR" ) SetupWJetsCR();
+    else if( SELECTION == "MakeROOTTrees" ) SetupMakeROOTTrees();
     // SETUP YOUR SELECTION HERE
 
     else {
@@ -406,6 +448,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
 
         if( SELECTION == "SignalRegion" ) SignalRegionSelection();
         else if( SELECTION == "WJetsCR" ) WJetsCRSelection();
+        else if( SELECTION == "MakeROOTTrees" ) MakeROOTTreesSelection();
         // CALL YOUR SELECTION HERE
 
     }
@@ -483,7 +526,11 @@ void LLGAnalysis::FinishRun() {
     gDirectory = _outputFile;
     _outputTree->Write();
     _outputFile->Close();
-
+    if( SELECTION == "MakeROOTTrees" ) {
+      gDirectory = _RT_outputFile;
+      _RT_outputTree->Write();
+      _RT_outputFile->Close();
+    }
     /* 
     cout << "PRINTING 2D OPTIMISATION MATRIX : " << endl;
     for( unsigned int i = 0; i < _yields2DOptimisation.size(); ++i ) {
