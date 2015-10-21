@@ -9,6 +9,7 @@ void LLGAnalysis::RunObjectID() {
     tightElectrons.clear();
     heepElectrons.clear();
     vetoMuons.clear();
+    tightMuons.clear();
     selectedJets.clear();
     recoJet_isLeptonLike->clear();
     // first the muons 
