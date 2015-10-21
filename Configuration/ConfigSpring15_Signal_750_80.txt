@@ -11,5 +11,5 @@ MET_CUT         210
 TARGET_LUMI     1000.
 MetadataFileName ../Configuration/DatasetMetadata.txt
 ApplyEventWeights 1
-SELECTION       SignalRegion
+Selection       SignalRegion
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/v0.4/Signal_750_80/crab_LLGDV_Analysis_Signal_750_80.root

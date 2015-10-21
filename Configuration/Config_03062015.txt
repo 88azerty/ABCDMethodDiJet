@@ -14,4 +14,4 @@ PROC_XSEC       832
 PROC_NTOT       25446993
 TARGET_LUMI     1000.
 ApplyEventWeights 1
-SELECTION       SignalRegion
+Selection       SignalRegion

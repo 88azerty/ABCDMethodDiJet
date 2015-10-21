@@ -1,5 +1,13 @@
 DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8    4895.0        9052671 
+Signal_250_40_Spring15                                    1190.35       165510
+Signal_250_60_Spring15                                    1190.35       164580
+Signal_500_40_Spring15                                      27.4171    	130866
+Signal_500_60_Spring15                                      27.4171    	129898
+Signal_500_80_Spring15                                      27.4171    	126423
+Signal_750_60_Spring15                                       2.26585    118416
 Signal_750_80_Spring15                                       2.26585    117781
+Signal_750_100_Spring15                                      2.26585    118351
+Signal_1000_100_Spring15                                     0.325388  	111385
 ZJetsToNuNu_HT-100To200_13TeV-madgraph			               280.47	      5148193
 ZJetsToNuNu_HT-200To400_13TeV-madgraph			                78.36 	    5032927
 ZJetsToNuNu_HT-400To600_13TeV-madgraph			                10.944	    1014139

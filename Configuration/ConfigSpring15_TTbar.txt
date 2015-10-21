@@ -11,7 +11,7 @@ MET_CUT         210
 TARGET_LUMI     1000.
 MetadataFileName ../Configuration/DatasetMetadata.txt
 ApplyEventWeights 1
-SELECTION       SignalRegion
+Selection       SignalRegion
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/v0.4/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/crab_LLGDV_Analysis_TTBarFXFX_part1.root
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/v0.4/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/crab_LLGDV_Analysis_TTBarFXFX_part2.root
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/v0.4/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/crab_LLGDV_Analysis_TTBarFXFX_part3.root
