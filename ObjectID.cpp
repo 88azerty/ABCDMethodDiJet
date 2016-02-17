@@ -16,7 +16,7 @@ void LLGAnalysis::RunObjectID() {
     for( unsigned int im = 0; im < muon_px->size(); ++im ) {
         double pt = sqrt(muon_px->at(im)*muon_px->at(im) + muon_py->at(im)*muon_py->at(im));
         if( muon_iso->size() > 0 ) {
-          if( muon_iso->at(im) / pt  > 0.2 ) continue;
+          if( muon_iso->at(im) > 0.2 ) continue;
         }
         if( pt < MUON_PT_CUT ) continue;
         

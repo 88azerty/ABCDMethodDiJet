@@ -50,6 +50,18 @@ class LLGAnalysis {
         void WJetsCRSelection();
         void SetupMakeROOTTrees();
         void MakeROOTTreesSelection();
+        void SetupSignalRegionTruthAnalysis();
+        void SignalRegionTruthAnalysisSelection();
+        void SetupWJetsTestRegion();
+        void WJetsTestRegionSelection();
+        void SetupZJetsTestRegion();
+        void ZJetsTestRegionSelection();
+        void SetupMuonTriggerDetermination();
+        void MuonTriggerDeterminationSelection();
+        void SetupVertexStudy();
+        void VertexStudySelection();
+        void SetupTriggerCheck();
+        void TriggerCheckSelection();
         // INSERT YOUR SELECTION HERE
 
 
@@ -74,7 +86,7 @@ class LLGAnalysis {
         bool                    _writeOutputTree;
 
         // variables for the 'normal' output trees
-        vector<double> *recoJet_pt; 
+        vector<vector<double> > *recoJet_pt; 
         vector<double> *recoJet_phi; 
         vector<double> *recoJet_eta; 
         vector<double> *recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags;
@@ -85,6 +97,10 @@ class LLGAnalysis {
         vector<double> *recoJet_vertex_x;
         vector<double> *recoJet_vertex_y;
         vector<double> *recoJet_vertex_z;
+        vector<double> *recoJet_vertex_score;
+        vector<int> *recoJet_nConsidered;
+        vector<double> *recoJet_averageDistance;;
+        vector<double> *recoJet_rmsDistance;
         vector<double> *muon_px; 
         vector<double> *muon_py; 
         vector<double> *muon_pz; 
@@ -136,6 +152,25 @@ class LLGAnalysis {
         vector<double> *secVertex_dx;
         vector<double> *secVertex_dy; 
         vector<double> *secVertex_dz; 
+         
+        vector<string> *to_TriggerNames;
+        vector<vector<double> > *to_pt;
+        vector<vector<double> > *to_eta;
+        vector<vector<double> > *to_phi;
+
+
+        vector<double> *mct_px;
+        vector<double> *mct_py;
+        vector<double> *mct_pz;
+        vector<double> *mct_e;
+        vector<int> *mct_id;
+        vector<int> *mct_status;
+        vector<vector<int> > *mct_parentId;
+        vector<vector<int> > *mct_parentStatus;
+        vector<vector<double> > *mct_parentPx;
+        vector<vector<double> > *mct_parentPy;
+        vector<vector<double> > *mct_parentPz;
+        vector<vector<double> > *mct_parentE;
 
         
         vector<int> vetoElectrons;
@@ -147,13 +182,34 @@ class LLGAnalysis {
         vector<int> tightMuons;
         vector<int> selectedJets;
 
-        double met;
-        double met_x;
-        double met_y;
-      
+        vector<double> *met;
+        vector<double> *met_x;
+        vector<double> *met_y;
+        int RunNumber;
+        int EventNumber;
+        int LumiBlock;
+        double generatorWeight;
+        string GenFileName;
 
+        // variables for systematics
+        int SYSJET;
+        int SYSMET;
+
+        ofstream passedLogFile;
 
         // variables for ROOT trees
+        vector<double> *  _RT_met;
+        vector<double> *  _RT_met_x;
+        vector<double> *  _RT_met_y;
+        double            _RT_evtWeight;
+        double            _RT_LeadingMuonPt;
+        double            _RT_LeadingMuonIso;
+        double            _RT_LeadingElectronPt;
+        double            _RT_LeadingElectronIso;
+        int               _RT_RunNumber;
+        int               _RT_EventNumber;
+        int               _RT_LumiBlock;
+        int               _RT_HLT_PFMET170_NoiseCleaned;
         int               _RT_nVetoElectrons;
         int               _RT_nLooseElectrons;
         int               _RT_nMediumElectrons;
@@ -173,8 +229,23 @@ class LLGAnalysis {
         int               _RT_nTightBJets20;
         int               _RT_nTightBJets30;
         int               _RT_nSVWith2Jets;
+        int               _RT_nPVWithJet150;
         double            _RT_PV_LeadingJetPt;
+        std::vector<double>*          _RT_SV_LeadingJetPt;
+        std::vector<double>*          _RT_SV_SubLeadingJetPt;
+        std::vector<double>*          _RT_SV_LeadingJetEta;
+        std::vector<double>*          _RT_SV_SubLeadingJetEta;
+        std::vector<double>*          _RT_SV_LeadingJetPhi;
+        std::vector<double>*          _RT_SV_SubLeadingJetPhi;
         double            _RT_SV_LeadingDiJetMass;
+        double            _RT_SV_MaxDistance;
+        double            _RT_SV_MaxDistanceR;
+        double            _RT_SV_MaxDistanceZ;
+        double            _RT_SV_MaxDistance_Uncert;
+        double            _RT_SV_MaxDistanceR_Uncert;
+        double            _RT_SV_MaxDistanceZ_Uncert;
+        std::vector<std::string>*     _RT_AllTriggerNames;
+        std::vector<int>*             _RT_AllTriggerBits;
 
         double evtWeight;
         double JET_PT_CUT_SV;
@@ -199,7 +270,7 @@ class LLGAnalysis {
 
         bool applyEventWeights;
         
-    
+        bool requireGenBranches; 
         vector<string> _plotFormats;
 
 };

@@ -29,7 +29,11 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     SELECTION = "SignalRegion";
     metadataFileName = "Configuration/DatasetMetadata.txt";
     datasetName = "Signal_500_60";
+    requireGenBranches = false;
+    GenFileName = "";
     _writeOutputTree = true;
+    SYSMET = 0;
+    SYSJET = 0;
 
     ifstream configFile( configFileName, ios::in );
     while( configFile.good() ) {
@@ -54,6 +58,8 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         if( key == "WriteOutputTree"   ) _writeOutputTree = (bool)(atoi(value.c_str()));
         if( key == "LEADING_SV_JET_CUT" ) LEADING_SV_JET_CUT = atof(value.c_str());
         if( key == "MJJ_CUT"           ) MJJ_CUT = atof(value.c_str());
+        if( key == "RequireGenBranches" ) requireGenBranches = (bool)(atoi(value.c_str()));
+        if( key == "GenFileName" )      GenFileName = value;
     }
     _outputFileName = datasetName + "_tree.root";
     _RT_outputFileName = datasetName + "_ROOTTree.root";
@@ -82,6 +88,7 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     if( !foundMetadata ) {
       cout << "Did not find dataset " << datasetName << " in " << metadataFileName << ". Using standard values for xsec and ntot: " << PROC_XSEC << " " << PROC_NTOT << endl;
     }
+    generatorWeight = 1.;
     evtWeight = applyEventWeights ? PROC_XSEC/PROC_NTOT * TARGET_LUMI : 1.;
     std::cout << "evtWeight is " << evtWeight << std::endl;
 }
@@ -193,13 +200,17 @@ bool LLGAnalysis::Init() {
     makeHist( "jet1_pt_HLT_PFJet260_v1", 50, 0., 1000., "Leading Jet p_{T} [GeV]", "Number of Events");
 
     // allocate memory for all the variables
-    recoJet_pt = new vector<double>;
+    recoJet_pt = new vector<vector<double> >;
     recoJet_phi = new vector<double>;
     recoJet_eta = new vector<double>;
     recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags = new vector<double>;
     recoJet_vertex_x = new vector<double>;
     recoJet_vertex_y = new vector<double>;
     recoJet_vertex_z = new vector<double>;
+    recoJet_vertex_score = new vector<double>;
+    recoJet_nConsidered = new vector<int>;
+    recoJet_averageDistance = new vector<double>;
+    recoJet_rmsDistance = new vector<double>;
 
     muon_px = new vector<double>;
     muon_py = new vector<double>;
@@ -221,6 +232,16 @@ bool LLGAnalysis::Init() {
     electron_isMedium = new vector<bool>;
     electron_isTight = new vector<bool>;
     electron_isHEEP = new vector<bool>;
+
+    _RT_SV_LeadingJetPt = new vector<double>;
+    _RT_SV_SubLeadingJetPt = new vector<double>;
+    _RT_SV_LeadingJetEta = new vector<double>;
+    _RT_SV_SubLeadingJetEta = new vector<double>;
+    _RT_SV_LeadingJetPhi = new vector<double>;
+    _RT_SV_SubLeadingJetPhi = new vector<double>;
+    _RT_AllTriggerNames = new vector<string>;
+    _RT_AllTriggerBits = new vector<int>;
+
 
     triggerBits = new vector<int>;
     triggerNames = new vector<string>;
@@ -252,7 +273,33 @@ bool LLGAnalysis::Init() {
     secVertex_dz = new vector<double>;
     secVertex_pt = new vector<double>;
     secVertex_ndof = new vector<double>;
-    
+ 
+    met = new vector<double>;
+    met_x = new vector<double>;
+    met_y = new vector<double>;
+    _RT_met = new vector<double>;
+    _RT_met_x = new vector<double>;
+    _RT_met_y = new vector<double>;
+
+    to_TriggerNames = new vector<string>;
+    to_pt = new vector<vector<double> >;
+    to_eta = new vector<vector<double> >;
+    to_phi = new vector<vector<double> >;
+
+    // variables for mc truth analysis
+    mct_px = new vector<double>;
+    mct_py = new vector<double>;
+    mct_pz = new vector<double>;
+    mct_e = new vector<double>;
+    mct_id = new vector<int>;
+    mct_status = new vector<int>;
+    mct_parentId = new vector<vector<int> >;
+    mct_parentStatus = new vector<vector<int> >;
+    mct_parentPx = new vector<vector<double> >;
+    mct_parentPy = new vector<vector<double> >;
+    mct_parentPz = new vector<vector<double> >;
+    mct_parentE = new vector<vector<double> >;
+
     // and set the branch addresses
     _inputTree->SetBranchAddress("RecoMuon_px", &muon_px );
     _inputTree->SetBranchAddress("RecoMuon_py", &muon_py );
@@ -286,6 +333,10 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_Vertex_x", &recoJet_vertex_x );
     _inputTree->SetBranchAddress("RecoJet_Vertex_y", &recoJet_vertex_y );
     _inputTree->SetBranchAddress("RecoJet_Vertex_z", &recoJet_vertex_z );
+    _inputTree->SetBranchAddress("RecoJet_Vertex_Score", &recoJet_vertex_score );
+    _inputTree->SetBranchAddress("RecoJet_nConsidered", &recoJet_nConsidered );
+    _inputTree->SetBranchAddress("RecoJet_AverageDistanceToVertex", &recoJet_averageDistance );
+    _inputTree->SetBranchAddress("RecoJet_RMSDistanceToVertex", &recoJet_rmsDistance );
     /*
     _inputTree->SetBranchAddress("RecoJet_constVertex_x", &recoJet_constVertex_x );
     _inputTree->SetBranchAddress("RecoJet_constVertex_y", &recoJet_constVertex_y );
@@ -313,10 +364,32 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoSecVertex_zError", &secVertex_dz );
     _inputTree->SetBranchAddress("RecoSecVertex_pt", &secVertex_pt );
     _inputTree->SetBranchAddress("RecoSecVertex_ndof", &secVertex_ndof );
+    _inputTree->SetBranchAddress("TriggerObject_TriggerName", &to_TriggerNames );
+    _inputTree->SetBranchAddress("TriggerObject_pt", &to_pt );
+    _inputTree->SetBranchAddress("TriggerObject_eta", &to_eta );
+    _inputTree->SetBranchAddress("TriggerObject_phi", &to_phi );
     _inputTree->SetBranchAddress("MET", &met );
     _inputTree->SetBranchAddress("MET_x", &met_x );
     _inputTree->SetBranchAddress("MET_y", &met_y );
-   
+    _inputTree->SetBranchAddress("RunNumber", &RunNumber );
+    _inputTree->SetBranchAddress("EventNumber", &EventNumber );
+    _inputTree->SetBranchAddress("LuminosityBlock", &LumiBlock );
+    _inputTree->SetBranchAddress("GeneratorWeight", &generatorWeight );
+    if( requireGenBranches ) {
+      std::cout << "setting mct branch addresses" << std::endl;
+      _inputTree->SetBranchAddress("GenLevel_px", &mct_px );
+      _inputTree->SetBranchAddress("GenLevel_py", &mct_py );
+      _inputTree->SetBranchAddress("GenLevel_pz", &mct_pz );
+      _inputTree->SetBranchAddress("GenLevel_E", &mct_e );
+      _inputTree->SetBranchAddress("GenLevel_PDGID", &mct_id );
+      _inputTree->SetBranchAddress("GenLevel_status", &mct_status );
+      _inputTree->SetBranchAddress("GenLevel_ParentId", &mct_parentId );
+      _inputTree->SetBranchAddress("GenLevel_ParentStatus", &mct_parentStatus );
+      _inputTree->SetBranchAddress("GenLevel_ParentPx", &mct_parentPx );
+      _inputTree->SetBranchAddress("GenLevel_ParentPy", &mct_parentPy );
+      _inputTree->SetBranchAddress("GenLevel_ParentPz", &mct_parentPz );
+      _inputTree->SetBranchAddress("GenLevel_ParentE", &mct_parentE );
+    }
 
     _outputTree->Branch("RecoMuon_px", &muon_px );
     _outputTree->Branch("RecoMuon_py", &muon_py );
@@ -377,14 +450,35 @@ bool LLGAnalysis::Init() {
     _outputTree->Branch("MET", &met );
     _outputTree->Branch("MET_x", &met_x );
     _outputTree->Branch("MET_y", &met_y );
+    if( requireGenBranches ) {
+      _outputTree->Branch("GenLevel_px", &mct_px );
+      _outputTree->Branch("GenLevel_py", &mct_py );
+      _outputTree->Branch("GenLevel_pz", &mct_pz );
+      _outputTree->Branch("GenLevel_E", &mct_e );
+      _outputTree->Branch("GenLevel_PDGID", &mct_id );
+      _outputTree->Branch("GenLevel_status", &mct_status );
+      _outputTree->Branch("GenLevel_ParentId", &mct_parentId );
+      _outputTree->Branch("GenLevel_ParentStatus", &mct_parentStatus );
+      _outputTree->Branch("GenLevel_ParentPx", &mct_parentPx );
+      _outputTree->Branch("GenLevel_ParentPy", &mct_parentPy );
+      _outputTree->Branch("GenLevel_ParentPz", &mct_parentPz );
+      _outputTree->Branch("GenLevel_ParentE", &mct_parentE );
+    }
   
     // ROOT Trees:
     if( SELECTION == "MakeROOTTrees" && _inputTree->GetEntries() > 0 ) { 
-      _inputTree->GetEntry(0);
-      for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
-        _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
-      }
-      _RT_outputTree->Branch("MET", &met );
+      //_inputTree->GetEntry(0);
+      //for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
+      //  _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
+      //}
+      _RT_outputTree->Branch("LeadingTightMuonPt", &_RT_LeadingMuonPt );
+      _RT_outputTree->Branch("LeadingTightMuonIso", &_RT_LeadingMuonIso );
+      _RT_outputTree->Branch("LeadingTightElectronPt", &_RT_LeadingElectronPt );
+      _RT_outputTree->Branch("LeadingTightElectronIso", &_RT_LeadingElectronIso );
+      _RT_outputTree->Branch("HLT_PFMET170_NoiseCleaned", &_RT_HLT_PFMET170_NoiseCleaned );
+      _RT_outputTree->Branch("MET", &_RT_met );
+      _RT_outputTree->Branch("MET_x", &_RT_met_x );
+      _RT_outputTree->Branch("MET_y", &_RT_met_y );
       _RT_outputTree->Branch("nVetoElectrons", &_RT_nVetoElectrons );
       _RT_outputTree->Branch("nLooseElectrons", &_RT_nLooseElectrons );
       _RT_outputTree->Branch("nMediumElectrons", &_RT_nMediumElectrons );
@@ -404,9 +498,25 @@ bool LLGAnalysis::Init() {
       _RT_outputTree->Branch("nTightBJets20", &_RT_nTightBJets20 );
       _RT_outputTree->Branch("nTightBJets30", &_RT_nTightBJets30 );
       _RT_outputTree->Branch("nSVWith2Jets", &_RT_nSVWith2Jets );
+      _RT_outputTree->Branch("nPVWithJet150", &_RT_nPVWithJet150 );
       _RT_outputTree->Branch("PVLeadingJet_pt", &_RT_PV_LeadingJetPt );
+      _RT_outputTree->Branch("SVLeadingJet_pt", &_RT_SV_LeadingJetPt );
+      _RT_outputTree->Branch("SVSubLeadingJet_pt", &_RT_SV_SubLeadingJetPt );
+      _RT_outputTree->Branch("SVLeadingJet_eta", &_RT_SV_LeadingJetEta );
+      _RT_outputTree->Branch("SVSubLeadingJet_eta", &_RT_SV_SubLeadingJetEta );
+      _RT_outputTree->Branch("SVLeadingJet_phi", &_RT_SV_LeadingJetPhi );
+      _RT_outputTree->Branch("SVSubLeadingJet_phi", &_RT_SV_SubLeadingJetPhi );
       _RT_outputTree->Branch("SVHighestDiJetMass", &_RT_SV_LeadingDiJetMass );
-      _RT_outputTree->Branch("EventWeight", &evtWeight );
+      _RT_outputTree->Branch("SVPVDistance", &_RT_SV_MaxDistance );
+      _RT_outputTree->Branch("SVPVDistance_R", &_RT_SV_MaxDistanceR );
+      _RT_outputTree->Branch("SVPVDistance_Z", &_RT_SV_MaxDistanceZ );
+      _RT_outputTree->Branch("SVPVDistance_Uncert", &_RT_SV_MaxDistance_Uncert );
+      _RT_outputTree->Branch("SVPVDistance_R_Uncert", &_RT_SV_MaxDistanceR_Uncert );
+      _RT_outputTree->Branch("SVPVDistance_Z_Uncert", &_RT_SV_MaxDistanceZ_Uncert );
+      _RT_outputTree->Branch("EventWeight", &_RT_evtWeight );
+      _RT_outputTree->Branch("EventNumber", &_RT_EventNumber );
+      _RT_outputTree->Branch("LuminosityBlock", &_RT_LumiBlock );
+      _RT_outputTree->Branch("RunNumber", &_RT_RunNumber );
     }
 
 
@@ -425,11 +535,17 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
   
     std::cout << "RUnning event loop for selection " << SELECTION << endl;
     if( nEntriesMax < 0 ) nEntriesMax = _inputTree -> GetEntries();
-  
+    std::cout << "will process " << nEntriesMax << " events" << endl;
 
     if( SELECTION == "SignalRegion" ) SetupSignalRegion();
     else if( SELECTION == "WJetsCR" ) SetupWJetsCR();
     else if( SELECTION == "MakeROOTTrees" ) SetupMakeROOTTrees();
+    else if( SELECTION == "SignalRegionTruthAnalysis" ) SetupSignalRegionTruthAnalysis();
+    else if( SELECTION == "WJetsTestRegion" ) SetupWJetsTestRegion();
+    else if( SELECTION == "ZJetsTestRegion" ) SetupZJetsTestRegion();
+    else if( SELECTION == "MuonTriggerDetermination" ) SetupMuonTriggerDetermination();
+    else if( SELECTION == "VertexStudy" ) SetupVertexStudy();
+    else if( SELECTION == "TriggerCheck" ) SetupTriggerCheck();
     // SETUP YOUR SELECTION HERE
 
     else {
@@ -443,14 +559,23 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         //cout << "====================" << endl;
     
         _inputTree->GetEntry(i);
+        evtWeight *= generatorWeight;
         RunObjectID(); 
         FillEfficiencyHistograms();
 
         if( SELECTION == "SignalRegion" ) SignalRegionSelection();
         else if( SELECTION == "WJetsCR" ) WJetsCRSelection();
         else if( SELECTION == "MakeROOTTrees" ) MakeROOTTreesSelection();
+        else if( SELECTION == "SignalRegionTruthAnalysis" ) SignalRegionTruthAnalysisSelection();
+        else if( SELECTION == "WJetsTestRegion" ) WJetsTestRegionSelection();
+        else if( SELECTION == "ZJetsTestRegion" ) ZJetsTestRegionSelection();
+        else if( SELECTION == "MuonTriggerDetermination" ) MuonTriggerDeterminationSelection();
+        else if( SELECTION == "VertexStudy" ) VertexStudySelection();
+        else if( SELECTION == "TriggerCheck" ) TriggerCheckSelection();
         // CALL YOUR SELECTION HERE
 
+        // restore original weight:
+        evtWeight /= generatorWeight;
     }
     cout << endl;
     return;
@@ -460,34 +585,33 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
 void LLGAnalysis::FillEfficiencyHistograms() {
         
     // don' fill these histograms with weights as they are used for the efficiency plots!
-    _histograms1D.at("MET_allEvents").Fill( met );
+    _histograms1D.at("MET_allEvents").Fill( met->at(SYSMET) );
     int leadingJet = -1;
     double leadingJetPt = 0.;
     for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
-        if( recoJet_pt->at(iJet) > leadingJetPt ) {
-            leadingJetPt = recoJet_pt->at(iJet);
+        if( recoJet_pt->at(iJet).at(SYSJET) > leadingJetPt ) {
+            leadingJetPt = recoJet_pt->at(iJet).at(SYSJET);
             leadingJet = iJet;
         }
     }
     // don' fill these histograms with weights as they are used for the efficiency plots!
-    if( leadingJet >= 0 ) _histograms1D.at("jet1_pt_allEvents").Fill( recoJet_pt->at(leadingJet) );
+    if( leadingJet >= 0 ) _histograms1D.at("jet1_pt_allEvents").Fill( recoJet_pt->at(leadingJet).at(SYSJET) );
 
 
     for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
             
         // don' fill these histograms with weights as they are used for the efficiency plots!
         if( triggerNames->at(iTrig) == "HLT_PFMET170_NoiseCleaned_v1" && triggerBits->at(iTrig) == 1 ) {
-            _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1").Fill( met );
+            _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1").Fill( met->at(SYSMET) );
         }
         if( triggerNames->at(iTrig) == "HLT_PFJet260_v1" && triggerBits->at(iTrig) == 1 ) {
-            _histograms1D.at("jet1_pt_HLT_PFJet260_v1" ).Fill( recoJet_pt->at(leadingJet) );
+            _histograms1D.at("jet1_pt_HLT_PFJet260_v1" ).Fill( recoJet_pt->at(leadingJet).at(SYSJET) );
         }
     }
 }
 
 void LLGAnalysis::FinishRun() {
 
-    
     TCanvas c("","");
     for( map<string,TH1D>::iterator itr_h = _histograms1D.begin(); itr_h != _histograms1D.end(); ++itr_h ) {
         (*itr_h).second.Draw( (_histograms1DDrawOptions.at((*itr_h).first)).c_str() );
@@ -499,15 +623,26 @@ void LLGAnalysis::FinishRun() {
     
     for( map<string,TH2D>::iterator itr_h = _histograms2D.begin(); itr_h != _histograms2D.end(); ++itr_h ) {
         (*itr_h).second.Draw( (_histograms2DDrawOptions.at((*itr_h).first)).c_str()  );
+        if( (*itr_h).first.find( "SV2Jets") != string::npos && (*itr_h).first.find("VertexScore") != string::npos ) {
+          c.SetLogx(1);
+          c.SetLogy(1);
+        }
         for( vector<string>::iterator itr_f = _plotFormats.begin(); itr_f != _plotFormats.end(); ++itr_f ) {
             string thisPlotName = (*itr_h).first + (*itr_f);
             c.Print( thisPlotName.c_str() );
         }
+        c.SetLogx(0);
+        c.SetLogy(0);
     }
     
     MakeEfficiencyPlot( _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1"), _histograms1D.at("MET_allEvents"), &c, "HLT_PFMET170_NoiseCleaned_v1" ); 
     MakeEfficiencyPlot( _histograms1D.at("jet1_pt_HLT_PFJet260_v1"), _histograms1D.at("jet1_pt_allEvents"), &c, "HLT_PFJet260_v1" ); 
-
+    if( SELECTION == "MuonTriggerDetermination" ) {
+      MakeEfficiencyPlot( _histograms1D.at("passedMuonsPt"), _histograms1D.at("allMuonsPt"), &c, "HLT_Mu50_v1_pt" );
+      MakeEfficiencyPlot( _histograms1D.at("passedMuonsEta"), _histograms1D.at("allMuonsEta"), &c, "HLT_Mu50_v1_eta" );
+      MakeEfficiencyPlot( _histograms1D.at("passedMuonsPhi"), _histograms1D.at("allMuonsPhi"), &c, "HLT_Mu50_v1_phi" );
+    }
+    
     cout << endl << "RECO CUT FLOW " << endl;
     cout << "-----------------------------" << endl;
     for( map<string,int>::iterator itr = _cutFlow.begin(); itr != _cutFlow.end(); ++itr ) {
@@ -554,6 +689,10 @@ void LLGAnalysis::FinishRun() {
     delete recoJet_vertex_x;
     delete recoJet_vertex_y;
     delete recoJet_vertex_z;
+    delete recoJet_vertex_score;
+    delete recoJet_nConsidered;
+    delete recoJet_averageDistance;
+    delete recoJet_rmsDistance;
     delete muon_px;
     delete muon_py;
     delete muon_pz;
