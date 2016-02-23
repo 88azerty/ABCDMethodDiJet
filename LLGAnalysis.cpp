@@ -25,6 +25,7 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     PROC_XSEC = 1.;
     PROC_NTOT = 1.;
     applyEventWeights = false;
+    applyPileupWeights = false;
     TARGET_LUMI = 1000.;
     SELECTION = "SignalRegion";
     metadataFileName = "Configuration/DatasetMetadata.txt";
@@ -52,6 +53,8 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         //if( key == "PROC_NTOT"         ) PROC_NTOT = atof(value.c_str());
         if( key == "TARGET_LUMI"       ) TARGET_LUMI = atof(value.c_str());
         if( key == "ApplyEventWeights" ) applyEventWeights = ( atoi(value.c_str()) == 1 );
+        if( key == "ApplyPileupWeights") applyPileupWeights = ( atoi(value.c_str()) == 1 );
+        if( key == "PileupFileName"    ) PUFILE = value;
         if( key == "Selection"         ) SELECTION = value;
         if( key == "MetadataFileName"  ) metadataFileName = value;
         if( key == "DatasetName"       ) datasetName = value;
@@ -61,6 +64,33 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         if( key == "RequireGenBranches" ) requireGenBranches = (bool)(atoi(value.c_str()));
         if( key == "GenFileName" )      GenFileName = value;
     }
+
+
+    // generate the pileup reweighting histogram 
+    if( applyPileupWeights ) {
+      
+      string mcHistogramName = "Distribution_" + datasetName;
+      TFile *fPU = new TFile( PUFILE.c_str(), "OPEN" );
+      if( !fPU || fPU->IsZombie() ) {
+        std::cout << "FATAL: COULDN'T OPEN PILEUPFILE: " << PUFILE << std::endl;
+        exit(-1);
+      }
+
+      TH1D *hdata = (TH1D*)fPU->Get("Distribution_Data");
+      TH1D *hmc = (TH1D*)fPU->Get(mcHistogramName.c_str());
+      if( !hdata || !hmc ) {
+        std::cout << "FATAL: COULDN'T LOAD HISTOGRAM(S): Distribution_Data or " << mcHistogramName << std::endl;
+      }
+      hdata->Scale( 1./hdata->Integral() );
+      hmc->Scale( 1./hmc->Integral() );
+      hPU_weights = new TH1D("PileupWeights", "PileupWeights", hdata->GetXaxis()->GetNbins(), hdata->GetXaxis()->GetBinLowEdge(1), hdata->GetXaxis()->GetBinLowEdge( hdata->GetXaxis()->GetNbins() + 1) );
+      for( int iBin = 1; iBin <= hdata->GetXaxis()->GetNbins(); ++iBin ) {
+        hPU_weights->SetBinContent( iBin, hdata->GetBinContent(iBin) / hmc->GetBinContent(iBin) );
+      }
+
+    }
+
+
     _outputFileName = datasetName + "_tree.root";
     _RT_outputFileName = datasetName + "_ROOTTree.root";
     _outputFile = new TFile( _outputFileName.c_str(), "RECREATE" );
@@ -347,6 +377,8 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_dz", &recoJet_const_closestVertex_dz );
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
     */
+    _inputTree->SetBranchAddress("PUINFO_NumberOfTrueInteractions", &NumberOfTrueInteractions );
+    _inputTree->SetBranchAddress("PUINFO_NumberOfObservedInteractions", &NumberOfObservedInteractions );
     _inputTree->SetBranchAddress("RecoVertex_x", &vertex_x );
     _inputTree->SetBranchAddress("RecoVertex_y", &vertex_y );
     _inputTree->SetBranchAddress("RecoVertex_z", &vertex_z );
@@ -471,11 +503,19 @@ bool LLGAnalysis::Init() {
       //for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
       //  _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
       //}
+      _RT_outputTree->Branch("GeneratorWeight", &_RT_generatorWeight );
+      _RT_outputTree->Branch("PileupWeight", &_RT_pileupWeight );
       _RT_outputTree->Branch("LeadingTightMuonPt", &_RT_LeadingMuonPt );
       _RT_outputTree->Branch("LeadingTightMuonIso", &_RT_LeadingMuonIso );
       _RT_outputTree->Branch("LeadingTightElectronPt", &_RT_LeadingElectronPt );
       _RT_outputTree->Branch("LeadingTightElectronIso", &_RT_LeadingElectronIso );
       _RT_outputTree->Branch("HLT_PFMET170_NoiseCleaned", &_RT_HLT_PFMET170_NoiseCleaned );
+      _RT_outputTree->Branch("HLT_Mu50", &_RT_HLT_Mu50 );
+      _RT_outputTree->Branch("HLT_Mu45_eta2p1", &_RT_HLT_Mu45_eta2p1 );
+      _RT_outputTree->Branch("HLT_Ele27_WP85_Gsf", &_RT_HLT_Ele27_WP85_Gsf );
+      _RT_outputTree->Branch("HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight );
+      _RT_outputTree->Branch("HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight );
+      _RT_outputTree->Branch("HLT_PFMETNoMu90_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight );
       _RT_outputTree->Branch("MET", &_RT_met );
       _RT_outputTree->Branch("MET_x", &_RT_met_x );
       _RT_outputTree->Branch("MET_y", &_RT_met_y );
@@ -546,6 +586,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
     else if( SELECTION == "MuonTriggerDetermination" ) SetupMuonTriggerDetermination();
     else if( SELECTION == "VertexStudy" ) SetupVertexStudy();
     else if( SELECTION == "TriggerCheck" ) SetupTriggerCheck();
+    else if( SELECTION == "METTriggerEfficiencyDetermination" ) SetupMETTriggerEfficiencyDetermination();
     // SETUP YOUR SELECTION HERE
 
     else {
@@ -559,7 +600,18 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         //cout << "====================" << endl;
     
         _inputTree->GetEntry(i);
+
+        // handle the weights
         evtWeight *= generatorWeight;
+        pileupWeight = 1.; 
+        
+        if( applyPileupWeights ) {
+          int bin = hPU_weights->GetXaxis()->FindBin( NumberOfTrueInteractions );
+          pileupWeight = hPU_weights->GetBinContent( bin );
+        }
+        evtWeight *= pileupWeight;
+
+
         RunObjectID(); 
         FillEfficiencyHistograms();
 
@@ -572,6 +624,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         else if( SELECTION == "MuonTriggerDetermination" ) MuonTriggerDeterminationSelection();
         else if( SELECTION == "VertexStudy" ) VertexStudySelection();
         else if( SELECTION == "TriggerCheck" ) TriggerCheckSelection();
+        else if( SELECTION == "METTriggerEfficiencyDetermination" ) METTriggerEfficiencyDeterminationSelection();
         // CALL YOUR SELECTION HERE
 
         // restore original weight:
@@ -677,6 +730,7 @@ void LLGAnalysis::FinishRun() {
     */
 
     delete _inputTree;
+    delete hPU_weights;
     delete recoJet_pt;
     delete recoJet_phi;
     delete recoJet_eta;

@@ -12,7 +12,44 @@ void LLGAnalysis::SetupMakeROOTTrees() {
 
 void LLGAnalysis::MakeROOTTreesSelection() {
 
-    _RT_HLT_PFMET170_NoiseCleaned = triggerBits->at(0);
+    int triggerBitsCounted_PFMET170 = 0;
+    int triggerBitsCounted_PFMET90_MHT = 0;
+    int triggerBitsCounted_PFMET90_MHT_NoiseCleaned = 0;
+    int triggerBitsCounted_PFMET90_MHT_JetCleaned = 0;
+    int triggerBitsCounted_Mu50 = 0;
+    int triggerBitsCounted_Mu45_eta2p1 = 0;
+    int triggerBitsCounted_Ele27_WP85_Gsf = 0;
+    for( unsigned int i = 0; i < triggerNames->size(); ++i ) {
+      if( triggerNames->at(i).find("HLT_PFMET170_NoiseCleaned") != std::string::npos ) {
+        _RT_HLT_PFMET170_NoiseCleaned = triggerBits->at(i);
+        triggerBitsCounted_PFMET170 += 1;
+      }
+      if( triggerNames->at(i).find("HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight") != std::string::npos ) {
+        _RT_HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight = triggerBits->at(i);
+        triggerBitsCounted_PFMET90_MHT_JetCleaned += 1;
+      }
+      if( triggerNames->at(i).find("HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight") != std::string::npos ) {
+        _RT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight = triggerBits->at(i);
+        triggerBitsCounted_PFMET90_MHT_NoiseCleaned += 1;
+      }
+      if( triggerNames->at(i).find("HLT_PFMETNoMu90_PFMHTNoMu90_IDTight") != std::string::npos ) {
+        _RT_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight = triggerBits->at(i);
+        triggerBitsCounted_PFMET90_MHT += 1;
+      }
+      if( triggerNames->at(i).find("HLT_Mu50") != std::string::npos ) {
+        _RT_HLT_Mu50 = triggerBits->at(i);
+        triggerBitsCounted_Mu50 += 1;
+      }
+      if( triggerNames->at(i).find("HLT_Mu45_eta2p1") != std::string::npos ) {
+        _RT_HLT_Mu45_eta2p1 = triggerBits->at(i);
+        triggerBitsCounted_Mu45_eta2p1 += 1;
+      }
+      if( triggerNames->at(i).find("HLT_Ele27_WP85_Gsf") != std::string::npos ) {
+        _RT_HLT_Ele27_WP85_Gsf = triggerBits->at(i);
+        triggerBitsCounted_Ele27_WP85_Gsf += 1;
+      }
+
+    }
     _RT_LeadingMuonPt = 0.;
     _RT_LeadingMuonIso = -1.;
     _RT_LeadingElectronPt = 0.;
@@ -22,6 +59,9 @@ void LLGAnalysis::MakeROOTTreesSelection() {
     _RT_EventNumber = EventNumber;
     _RT_LumiBlock = LumiBlock;
     _RT_evtWeight = evtWeight;
+    _RT_generatorWeight = generatorWeight;
+    _RT_pileupWeight = pileupWeight;
+
 
     _RT_met->clear();
     _RT_met_y->clear();

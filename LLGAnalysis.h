@@ -62,6 +62,8 @@ class LLGAnalysis {
         void VertexStudySelection();
         void SetupTriggerCheck();
         void TriggerCheckSelection();
+        void SetupMETTriggerEfficiencyDetermination();
+        void METTriggerEfficiencyDeterminationSelection();
         // INSERT YOUR SELECTION HERE
 
 
@@ -188,8 +190,12 @@ class LLGAnalysis {
         int RunNumber;
         int EventNumber;
         int LumiBlock;
+        int NumberOfObservedInteractions;
+        float NumberOfTrueInteractions;
         double generatorWeight;
+        double pileupWeight;
         string GenFileName;
+
 
         // variables for systematics
         int SYSJET;
@@ -198,6 +204,8 @@ class LLGAnalysis {
         ofstream passedLogFile;
 
         // variables for ROOT trees
+        double            _RT_generatorWeight;
+        double            _RT_pileupWeight;
         vector<double> *  _RT_met;
         vector<double> *  _RT_met_x;
         vector<double> *  _RT_met_y;
@@ -210,6 +218,12 @@ class LLGAnalysis {
         int               _RT_EventNumber;
         int               _RT_LumiBlock;
         int               _RT_HLT_PFMET170_NoiseCleaned;
+        int               _RT_HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight;
+        int               _RT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight;
+        int               _RT_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight;
+        int               _RT_HLT_Mu50;
+        int               _RT_HLT_Mu45_eta2p1;
+        int               _RT_HLT_Ele27_WP85_Gsf;
         int               _RT_nVetoElectrons;
         int               _RT_nLooseElectrons;
         int               _RT_nMediumElectrons;
@@ -269,7 +283,13 @@ class LLGAnalysis {
         double TARGET_LUMI;
 
         bool applyEventWeights;
+        bool applyPileupWeights;
         
+
+        //for pileup reweighting
+        std::string PUFILE;
+        TH1D *hPU_weights;
+
         bool requireGenBranches; 
         vector<string> _plotFormats;
 
