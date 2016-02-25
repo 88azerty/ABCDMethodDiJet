@@ -193,19 +193,23 @@ class LLGAnalysis {
         int NumberOfObservedInteractions;
         float NumberOfTrueInteractions;
         double generatorWeight;
+        double lumiWeight;
         double pileupWeight;
         string GenFileName;
 
 
+        string PUTYPE;
         // variables for systematics
         int SYSJET;
         int SYSMET;
+        string SYSPILEUP;
 
         ofstream passedLogFile;
 
         // variables for ROOT trees
         double            _RT_generatorWeight;
         double            _RT_pileupWeight;
+        double            _RT_lumiWeight;
         vector<double> *  _RT_met;
         vector<double> *  _RT_met_x;
         vector<double> *  _RT_met_y;

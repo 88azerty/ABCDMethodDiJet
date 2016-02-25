@@ -33,8 +33,10 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     requireGenBranches = false;
     GenFileName = "";
     _writeOutputTree = true;
+    PUTYPE = "True_";
     SYSMET = 0;
     SYSJET = 0;
+    SYSPILEUP = "NOMINAL";
 
     ifstream configFile( configFileName, ios::in );
     while( configFile.good() ) {
@@ -69,14 +71,16 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     // generate the pileup reweighting histogram 
     if( applyPileupWeights ) {
       
-      string mcHistogramName = "Distribution_" + datasetName;
+      string mcHistogramName   = "Distribution_" + PUTYPE + datasetName;
+      string dataHistogramName = "Distribution_Data_" + PUTYPE + SYSPILEUP;
       TFile *fPU = new TFile( PUFILE.c_str(), "OPEN" );
       if( !fPU || fPU->IsZombie() ) {
         std::cout << "FATAL: COULDN'T OPEN PILEUPFILE: " << PUFILE << std::endl;
         exit(-1);
       }
 
-      TH1D *hdata = (TH1D*)fPU->Get("Distribution_Data");
+      
+      TH1D *hdata = (TH1D*)fPU->Get(dataHistogramName.c_str());
       TH1D *hmc = (TH1D*)fPU->Get(mcHistogramName.c_str());
       if( !hdata || !hmc ) {
         std::cout << "FATAL: COULDN'T LOAD HISTOGRAM(S): Distribution_Data or " << mcHistogramName << std::endl;
@@ -119,8 +123,8 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
       cout << "Did not find dataset " << datasetName << " in " << metadataFileName << ". Using standard values for xsec and ntot: " << PROC_XSEC << " " << PROC_NTOT << endl;
     }
     generatorWeight = 1.;
-    evtWeight = applyEventWeights ? PROC_XSEC/PROC_NTOT * TARGET_LUMI : 1.;
-    std::cout << "evtWeight is " << evtWeight << std::endl;
+    lumiWeight = applyEventWeights ? PROC_XSEC/PROC_NTOT * TARGET_LUMI : 1.;
+    std::cout << "lumiWeight is " << lumiWeight << std::endl;
 }
 
 void LLGAnalysis::MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, string triggerName ) {
@@ -378,7 +382,7 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
     */
     _inputTree->SetBranchAddress("PUINFO_NumberOfTrueInteractions", &NumberOfTrueInteractions );
-    _inputTree->SetBranchAddress("PUINFO_NumberOfObservedInteractions", &NumberOfObservedInteractions );
+    _inputTree->SetBranchAddress("PUINFO_NumberOfObservedInteractiosn", &NumberOfObservedInteractions );
     _inputTree->SetBranchAddress("RecoVertex_x", &vertex_x );
     _inputTree->SetBranchAddress("RecoVertex_y", &vertex_y );
     _inputTree->SetBranchAddress("RecoVertex_z", &vertex_z );
@@ -554,6 +558,7 @@ bool LLGAnalysis::Init() {
       _RT_outputTree->Branch("SVPVDistance_R_Uncert", &_RT_SV_MaxDistanceR_Uncert );
       _RT_outputTree->Branch("SVPVDistance_Z_Uncert", &_RT_SV_MaxDistanceZ_Uncert );
       _RT_outputTree->Branch("EventWeight", &_RT_evtWeight );
+      _RT_outputTree->Branch("LumiWeight", &_RT_lumiWeight );
       _RT_outputTree->Branch("EventNumber", &_RT_EventNumber );
       _RT_outputTree->Branch("LuminosityBlock", &_RT_LumiBlock );
       _RT_outputTree->Branch("RunNumber", &_RT_RunNumber );
@@ -602,6 +607,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         _inputTree->GetEntry(i);
 
         // handle the weights
+        evtWeight = lumiWeight;
         evtWeight *= generatorWeight;
         pileupWeight = 1.; 
         
@@ -627,8 +633,6 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         else if( SELECTION == "METTriggerEfficiencyDetermination" ) METTriggerEfficiencyDeterminationSelection();
         // CALL YOUR SELECTION HERE
 
-        // restore original weight:
-        evtWeight /= generatorWeight;
     }
     cout << endl;
     return;

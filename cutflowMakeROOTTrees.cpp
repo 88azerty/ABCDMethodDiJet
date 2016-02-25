@@ -59,6 +59,7 @@ void LLGAnalysis::MakeROOTTreesSelection() {
     _RT_EventNumber = EventNumber;
     _RT_LumiBlock = LumiBlock;
     _RT_evtWeight = evtWeight;
+    _RT_lumiWeight = lumiWeight;
     _RT_generatorWeight = generatorWeight;
     _RT_pileupWeight = pileupWeight;
 
