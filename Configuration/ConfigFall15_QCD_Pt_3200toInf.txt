@@ -13,3 +13,5 @@ MetadataFileName ../Configuration/DatasetMetadata.txt
 ApplyEventWeights 1
 Selection       MakeROOTTrees
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/QCD_Pt_3200toInf/QCD_Pt3200toInf.root
+PileupFileName ../Configuration/PileupHistograms.root
+ApplyPileupWeights 1

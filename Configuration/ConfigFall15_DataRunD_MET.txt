@@ -1,5 +1,5 @@
 InputTree       RecoData
-DatasetName     Signal_750_60_Fall15
+DatasetName     DataRunD_MET
 JET_PT_CUT_SV   30
 JET_PT_CUT_PV   150
 JET_ETA_CUT     2.4
@@ -8,10 +8,8 @@ ELECTRON_PT_CUT 15
 MJJ_CUT         60
 LEADING_SV_JET_CUT 10000
 MET_CUT         210
-TARGET_LUMI     2260.
+TARGET_LUMI     1
 MetadataFileName ../Configuration/DatasetMetadata.txt
-ApplyEventWeights 1
+ApplyEventWeights 0
 Selection       MakeROOTTrees
-InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/Signal_750_60/Signal_750_60.root
-PileupFileName ../Configuration/PileupHistograms.root
-ApplyPileupWeights 1
+InputFile       ./NTUPLE_DataRunD_MET.root

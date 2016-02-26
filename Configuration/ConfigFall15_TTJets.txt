@@ -16,3 +16,5 @@ InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/TTJets/TTJets_part2.root
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/TTJets/TTJets_part3.root
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/TTJets/TTJets_part4.root
+PileupFileName ../Configuration/PileupHistograms.root
+ApplyPileupWeights 1

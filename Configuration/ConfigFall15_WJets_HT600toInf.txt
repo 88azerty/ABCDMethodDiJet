@@ -13,3 +13,5 @@ MetadataFileName ../Configuration/DatasetMetadata.txt
 ApplyEventWeights 1
 Selection       MakeROOTTrees
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/WJets_HT600toInf/WJets_HT600toInf.root
+PileupFileName ../Configuration/PileupHistograms.root
+ApplyPileupWeights 1

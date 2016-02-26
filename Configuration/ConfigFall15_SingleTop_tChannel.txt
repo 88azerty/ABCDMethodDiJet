@@ -14,3 +14,5 @@ ApplyEventWeights 1
 Selection       MakeROOTTrees
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/SingleTop_tChannel/SingleTop_tChannel_part1.root
 InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/SingleTop_tChannel/SingleTop_tChannel_part2.root
+PileupFileName ../Configuration/PileupHistograms.root
+ApplyPileupWeights 1

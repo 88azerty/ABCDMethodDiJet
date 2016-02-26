@@ -1,5 +1,5 @@
 InputTree       RecoData
-DatasetName     ZJetsToNuNu_HT-600ToInf_13TeV-madgraph
+DatasetName     DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8
 JET_PT_CUT_SV   30
 JET_PT_CUT_PV   150
 JET_ETA_CUT     2.4
@@ -11,7 +11,7 @@ MET_CUT         210
 TARGET_LUMI     2260.
 MetadataFileName ../Configuration/DatasetMetadata.txt
 ApplyEventWeights 1
-Selection       MakeROOTTrees
-InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/ZJets_HT600toInf/ZJets_HT600toInf.root
+Selection       MakeROOTTrees 
+InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/DYJetsToLL_M-10to50/DYJetsToLL_M-10to50.root
 PileupFileName ../Configuration/PileupHistograms.root
 ApplyPileupWeights 1
