@@ -33,7 +33,9 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     requireGenBranches = false;
     GenFileName = "";
     _writeOutputTree = true;
-    PUTYPE = "True_";
+    PUTYPE = "True";
+    
+    RUNSYS = "NOMINAL";
     SYSMET = 0;
     SYSJET = 0;
     SYSPILEUP = "NOMINAL";
@@ -43,36 +45,42 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         string key, value;
         configFile >> key >> ws >> value;
         if( configFile.eof() ) break;
-        if( key == "InputFile"         ) _inputFileNames.push_back( value ); 
-        if( key == "InputTree"         ) _inputTreeName = value; 
-        if( key == "JET_PT_CUT_SV"     ) JET_PT_CUT_SV = atof(value.c_str());
-        if( key == "JET_PT_CUT_PV"     ) JET_PT_CUT_PV = atof(value.c_str());
-        if( key == "JET_ETA_CUT"       ) JET_ETA_CUT = atof(value.c_str());
-        if( key == "MUON_PT_CUT"       ) MUON_PT_CUT = atof(value.c_str()); 
-        if( key == "ELECTRON_PT_CUT"   ) ELECTRON_PT_CUT = atof(value.c_str()); 
-        if( key == "MET_CUT"           ) MET_CUT = atof(value.c_str()); 
-        //if( key == "PROC_XSEC"         ) PROC_XSEC = atof(value.c_str());
-        //if( key == "PROC_NTOT"         ) PROC_NTOT = atof(value.c_str());
-        if( key == "TARGET_LUMI"       ) TARGET_LUMI = atof(value.c_str());
-        if( key == "ApplyEventWeights" ) applyEventWeights = ( atoi(value.c_str()) == 1 );
-        if( key == "ApplyPileupWeights") applyPileupWeights = ( atoi(value.c_str()) == 1 );
-        if( key == "PileupFileName"    ) PUFILE = value;
-        if( key == "Selection"         ) SELECTION = value;
-        if( key == "MetadataFileName"  ) metadataFileName = value;
-        if( key == "DatasetName"       ) datasetName = value;
-        if( key == "WriteOutputTree"   ) _writeOutputTree = (bool)(atoi(value.c_str()));
-        if( key == "LEADING_SV_JET_CUT" ) LEADING_SV_JET_CUT = atof(value.c_str());
-        if( key == "MJJ_CUT"           ) MJJ_CUT = atof(value.c_str());
-        if( key == "RequireGenBranches" ) requireGenBranches = (bool)(atoi(value.c_str()));
-        if( key == "GenFileName" )      GenFileName = value;
+        if( key == "InputFile"          )   _inputFileNames.push_back( value ); 
+        if( key == "InputTree"          )   _inputTreeName = value; 
+        if( key == "JET_PT_CUT_SV"      )   JET_PT_CUT_SV = atof(value.c_str());
+        if( key == "JET_PT_CUT_PV"      )   JET_PT_CUT_PV = atof(value.c_str());
+        if( key == "JET_ETA_CUT"        )   JET_ETA_CUT = atof(value.c_str());
+        if( key == "MUON_PT_CUT"        )   MUON_PT_CUT = atof(value.c_str()); 
+        if( key == "ELECTRON_PT_CUT"    )   ELECTRON_PT_CUT = atof(value.c_str()); 
+        if( key == "MET_CUT"            )   MET_CUT = atof(value.c_str()); 
+        if( key == "TARGET_LUMI"        )   TARGET_LUMI = atof(value.c_str());
+        if( key == "ApplyEventWeights"  )   applyEventWeights = ( atoi(value.c_str()) == 1 );
+        if( key == "ApplyPileupWeights" )   applyPileupWeights = ( atoi(value.c_str()) == 1 );
+        if( key == "PileupFileName"     )   PUFILE = value;
+        if( key == "PileupType"         )   PUTYPE = value;
+        if( key == "Selection"          )   SELECTION = value;
+        if( key == "MetadataFileName"   )   metadataFileName = value;
+        if( key == "DatasetName"        )   datasetName = value;
+        if( key == "WriteOutputTree"    )   _writeOutputTree = (bool)(atoi(value.c_str()));
+        if( key == "LEADING_SV_JET_CUT" )   LEADING_SV_JET_CUT = atof(value.c_str());
+        if( key == "MJJ_CUT"            )   MJJ_CUT = atof(value.c_str());
+        if( key == "RequireGenBranches" )   requireGenBranches = (bool)(atoi(value.c_str()));
+        if( key == "GenFileName"        )   GenFileName = value;
+        if( key == "SystUncert"         )   RUNSYS = value;
     }
-
+    
+    if( RUNSYS == "JECUP"   ) { SYSJET = 1; SYSMET = 3; }
+    if( RUNSYS == "JECDOWN" ) { SYSJET = 2; SYSMET = 4; }
+    if( RUNSYS == "UNCUP"   ) { SYSMET = 11; }
+    if( RUNSYS == "UNCDOWN" ) { SYSMET = 12; }
+    if( RUNSYS == "PUUP"    ) { SYSPILEUP = "MBXSUP"; }
+    if( RUNSYS == "PUDOWN"  ) { SYSPILEUP = "MBXSDOWN"; }
 
     // generate the pileup reweighting histogram 
     if( applyPileupWeights ) {
       
-      string mcHistogramName   = "Distribution_" + PUTYPE + datasetName;
-      string dataHistogramName = "Distribution_Data_" + PUTYPE + SYSPILEUP;
+      string mcHistogramName   = "Distribution_" + PUTYPE + "_" + datasetName;
+      string dataHistogramName = "Distribution_Data_" + PUTYPE + "_" + SYSPILEUP;
       TFile *fPU = new TFile( PUFILE.c_str(), "OPEN" );
       if( !fPU || fPU->IsZombie() ) {
         std::cout << "FATAL: COULDN'T OPEN PILEUPFILE: " << PUFILE << std::endl;
@@ -517,6 +525,7 @@ bool LLGAnalysis::Init() {
       _RT_outputTree->Branch("HLT_Mu50", &_RT_HLT_Mu50 );
       _RT_outputTree->Branch("HLT_Mu45_eta2p1", &_RT_HLT_Mu45_eta2p1 );
       _RT_outputTree->Branch("HLT_Ele27_WP85_Gsf", &_RT_HLT_Ele27_WP85_Gsf );
+      _RT_outputTree->Branch("HLT_Ele105_CaloIdVT_GsfTrkIdT", &_RT_HLT_Ele105_CaloIdVT_GsfTrkIdT );
       _RT_outputTree->Branch("HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight );
       _RT_outputTree->Branch("HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight );
       _RT_outputTree->Branch("HLT_PFMETNoMu90_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight );

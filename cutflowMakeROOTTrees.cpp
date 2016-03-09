@@ -19,6 +19,7 @@ void LLGAnalysis::MakeROOTTreesSelection() {
     int triggerBitsCounted_Mu50 = 0;
     int triggerBitsCounted_Mu45_eta2p1 = 0;
     int triggerBitsCounted_Ele27_WP85_Gsf = 0;
+    int triggerBitsCounted_Ele105_CaloIdVT_GsfTrkIdT = 0;
     for( unsigned int i = 0; i < triggerNames->size(); ++i ) {
       if( triggerNames->at(i).find("HLT_PFMET170_NoiseCleaned") != std::string::npos ) {
         _RT_HLT_PFMET170_NoiseCleaned = triggerBits->at(i);
@@ -48,8 +49,14 @@ void LLGAnalysis::MakeROOTTreesSelection() {
         _RT_HLT_Ele27_WP85_Gsf = triggerBits->at(i);
         triggerBitsCounted_Ele27_WP85_Gsf += 1;
       }
+      if( triggerNames->at(i).find("HLT_Ele105_CaloIdVT_GsfTrkIdT") != std::string::npos ) {
+        _RT_HLT_Ele105_CaloIdVT_GsfTrkIdT = triggerBits->at(i);
+        triggerBitsCounted_Ele105_CaloIdVT_GsfTrkIdT += 1;
+      }
 
     }
+    
+
     _RT_LeadingMuonPt = 0.;
     _RT_LeadingMuonIso = -1.;
     _RT_LeadingElectronPt = 0.;

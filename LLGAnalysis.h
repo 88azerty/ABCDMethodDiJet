@@ -203,6 +203,7 @@ class LLGAnalysis {
         int SYSJET;
         int SYSMET;
         string SYSPILEUP;
+        string RUNSYS;
 
         ofstream passedLogFile;
 
@@ -228,6 +229,7 @@ class LLGAnalysis {
         int               _RT_HLT_Mu50;
         int               _RT_HLT_Mu45_eta2p1;
         int               _RT_HLT_Ele27_WP85_Gsf;
+        int               _RT_HLT_Ele105_CaloIdVT_GsfTrkIdT;
         int               _RT_nVetoElectrons;
         int               _RT_nLooseElectrons;
         int               _RT_nMediumElectrons;

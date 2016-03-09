@@ -1,4 +1,5 @@
 #include "LLGAnalysis.h"
+#include "TLorentzVector.h"
 void LLGAnalysis::SetupMuonTriggerDetermination() {
 
     // setup the cutflow
@@ -6,6 +7,7 @@ void LLGAnalysis::SetupMuonTriggerDetermination() {
     _cutFlow.insert(pair<string,int>("1_Trigger", 0) );
     _cutFlow.insert(pair<string,int>("2_ElectronVeto", 0) );
     _cutFlow.insert(pair<string,int>("3_2TightMuons", 0) );
+    _cutFlow.insert(pair<string,int>("4_ZWindow", 0) );
 
     // and the histograms
     makeHist("allMuonsPt", 50, 0., 100., "Muon p_{T} [GeV]", "Number of Muons" );
@@ -24,7 +26,7 @@ void LLGAnalysis::MuonTriggerDeterminationSelection() {
 
     bool passTrigger = false;
     for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
-        if( triggerNames->at(iTrig) == "HLT_Mu50_v1" && triggerBits->at(iTrig) == 1 ) passTrigger = true;
+        if( (triggerNames->at(iTrig).find("HLT_Mu50") != string::npos ) && triggerBits->at(iTrig) == 1 ) passTrigger = true;
     }
 
     if( !passTrigger ) return;
@@ -36,10 +38,20 @@ void LLGAnalysis::MuonTriggerDeterminationSelection() {
     if( tightMuons.size() != 2 ) return;
     _cutFlow.at("3_2TightMuons") += 1;
 
+    TLorentzVector LVM1, LVM2;
+    double pt1 = sqrt( muon_px->at(tightMuons.at(0))*muon_px->at(tightMuons.at(0)) + muon_py->at(tightMuons.at(0))*muon_py->at(tightMuons.at(0)) );
+    double pt2 = sqrt( muon_px->at(tightMuons.at(1))*muon_px->at(tightMuons.at(1)) + muon_py->at(tightMuons.at(1))*muon_py->at(tightMuons.at(1)) );
+    LVM1.SetPtEtaPhiM( pt1, muon_eta->at(tightMuons.at(0)), muon_phi->at(tightMuons.at(0)), 0.105 );
+    LVM2.SetPtEtaPhiM( pt2, muon_eta->at(tightMuons.at(1)), muon_phi->at(tightMuons.at(1)), 0.105 );
+
+    TLorentzVector LVZC = LVM1 + LVM2;
+    if( fabs( LVZC.M() - 91.19 ) > 10. ) return; 
+    _cutFlow.at("4_ZWindow") += 1;
+
     //find matches for the muons;
     vector<int> foundMatch(2, 0);
     for( unsigned int k = 0; k < to_TriggerNames->size(); ++k ) {
-      if( to_TriggerNames->at(k) == "HLT_Mu50_v1" ) {
+      if( to_TriggerNames->at(k) == "HLT_Mu50" ) {
         for( unsigned int to = 0; to < to_pt->at(k).size(); ++to ) {
           for( unsigned int iMuon = 0; iMuon < 2; ++iMuon ) {
             double deta = fabs(muon_eta->at(tightMuons.at(iMuon)) - to_eta->at(k).at(to) );
