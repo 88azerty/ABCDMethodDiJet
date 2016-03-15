@@ -12,4 +12,4 @@ TARGET_LUMI     1
 MetadataFileName ../Configuration/DatasetMetadata.txt
 ApplyEventWeights 0
 Selection       MakeROOTTrees
-InputFile       ./NTUPLE_DataRunC_Electron.root
+InputFile       /afs/cern.ch/user/m/mhamer/work/public/LLGDVFiles_Spring15/76_v1/Data/NTUPLE_DataRunC_Electron.root
