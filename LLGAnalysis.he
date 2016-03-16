@@ -63,7 +63,6 @@ class LLGAnalysis {
         void SetupTriggerCheck();
         void TriggerCheckSelection();
         void SetupMETTriggerEfficiencyDetermination();
-        void METTriggerEfficiencyDeterminationSelection();
         // INSERT YOUR SELECTION HERE
 
 
@@ -150,7 +149,6 @@ class LLGAnalysis {
         vector<double> *secVertex_y; 
         vector<double> *secVertex_z;
         vector<double> *secVertex_ndof;
-        vector<double> *secVertex_chi2;
         vector<double> *secVertex_pt;
         vector<double> *secVertex_dx;
         vector<double> *secVertex_dy; 
@@ -191,27 +189,16 @@ class LLGAnalysis {
         int RunNumber;
         int EventNumber;
         int LumiBlock;
-        int NumberOfObservedInteractions;
-        float NumberOfTrueInteractions;
         double generatorWeight;
-        double lumiWeight;
-        double pileupWeight;
         string GenFileName;
 
-
-        string PUTYPE;
         // variables for systematics
         int SYSJET;
         int SYSMET;
-        string SYSPILEUP;
-        string RUNSYS;
 
         ofstream passedLogFile;
 
         // variables for ROOT trees
-        double            _RT_generatorWeight;
-        double            _RT_pileupWeight;
-        double            _RT_lumiWeight;
         vector<double> *  _RT_met;
         vector<double> *  _RT_met_x;
         vector<double> *  _RT_met_y;
@@ -230,7 +217,6 @@ class LLGAnalysis {
         int               _RT_HLT_Mu50;
         int               _RT_HLT_Mu45_eta2p1;
         int               _RT_HLT_Ele27_WP85_Gsf;
-        int               _RT_HLT_Ele105_CaloIdVT_GsfTrkIdT;
         int               _RT_nVetoElectrons;
         int               _RT_nLooseElectrons;
         int               _RT_nMediumElectrons;
@@ -290,13 +276,7 @@ class LLGAnalysis {
         double TARGET_LUMI;
 
         bool applyEventWeights;
-        bool applyPileupWeights;
         
-
-        //for pileup reweighting
-        std::string PUFILE;
-        TH1D *hPU_weights;
-
         bool requireGenBranches; 
         vector<string> _plotFormats;
 
