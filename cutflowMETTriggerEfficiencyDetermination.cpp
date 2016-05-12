@@ -28,6 +28,7 @@ void LLGAnalysis::METTriggerEfficiencyDeterminationSelection() {
 
     if( muon_px->size() != 1 ) return; 
     _cutFlow.at("02_MuonMultiplicity") += 1;
+    if( electron_px->size() != 0 ) return;
 
     //double m_pt = sqrt( muon_px->at(0)*muon_px->at(0) + muon_py->at(0)*muon_py->at(0) );
     double m_eta = muon_eta->at(0);
@@ -47,16 +48,19 @@ void LLGAnalysis::METTriggerEfficiencyDeterminationSelection() {
 
     if( !thisMuonFiredTrigger) return; 
     _cutFlow.at("03_MuonTriggerMatching") += 1;
-
     double mht = 0;
     double mht_x = 0.;
     double mht_y = 0.;
-    for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
+    //for( unsigned int iJet = 0; iJet < recoJet_pt->size(); ++iJet ) {
+    for( unsigned int iiJet = 0; iiJet < selectedJets.size(); ++iiJet ) {
+      int iJet = selectedJets.at(iiJet);
       if( recoJet_pt->at(iJet).at(SYSJET) < 20. ) continue;
       if( fabs(recoJet_eta->at(iJet)) > 5 ) continue;
       mht_x -= recoJet_pt->at(iJet).at(SYSJET)*TMath::Cos(recoJet_phi->at(iJet));
       mht_y -= recoJet_pt->at(iJet).at(SYSJET)*TMath::Sin(recoJet_phi->at(iJet));
     }
+    mht_x += muon_px->at(0);
+    mht_y += muon_py->at(0);
     mht = sqrt( mht_x*mht_x + mht_y*mht_y );
     double rec_met_x = met_x->at(0) + muon_px->at(0);
     double rec_met_y = met_y->at(0) + muon_py->at(0);
@@ -72,6 +76,10 @@ void LLGAnalysis::METTriggerEfficiencyDeterminationSelection() {
            ||  triggerNames->at(iTrig).find("HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight") != std::string::npos
            ||  triggerNames->at(iTrig).find("HLT_PFMETNoMu90_PFMHTNoMu90_IDTight") != std::string::npos )
            && triggerBits->at(iTrig) == 1 ) passTargetTrigger = true;
+      //if(     (triggerNames->at(iTrig).find("HLT_PFMET90_JetIdCleaned_PFMHT90_IDTight") != std::string::npos
+      //     ||  triggerNames->at(iTrig).find("HLT_PFMET90_NoiseCleaned_PFMHT90_IDTight") != std::string::npos
+      //     ||  triggerNames->at(iTrig).find("HLT_PFMET90_PFMHT90_IDTight") != std::string::npos )
+      //     && triggerBits->at(iTrig) == 1 ) passTargetTrigger = true;
     }
 
     if( !passTargetTrigger ) return; 

@@ -20,6 +20,7 @@ void LLGAnalysis::MakeROOTTreesSelection() {
     int triggerBitsCounted_Mu45_eta2p1 = 0;
     int triggerBitsCounted_Ele27_WP85_Gsf = 0;
     int triggerBitsCounted_Ele105_CaloIdVT_GsfTrkIdT = 0;
+    
     for( unsigned int i = 0; i < triggerNames->size(); ++i ) {
       if( triggerNames->at(i).find("HLT_PFMET170_NoiseCleaned") != std::string::npos ) {
         _RT_HLT_PFMET170_NoiseCleaned = triggerBits->at(i);

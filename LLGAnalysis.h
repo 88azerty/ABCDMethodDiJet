@@ -43,7 +43,9 @@ class LLGAnalysis {
         void setStyle(double ytoff = 1.0, bool marker = true, double left_margin = 0.15); 
         void MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, string triggerName = "");
         void FillEfficiencyHistograms();
-        
+
+        std::vector<double> CalculatePCA( std::vector<double> *refPoint, std::vector<double> *momentum, std::vector<double> *vertex );
+
         void SetupSignalRegion();
         void SignalRegionSelection();
         void SetupWJetsCR();
@@ -64,6 +66,10 @@ class LLGAnalysis {
         void TriggerCheckSelection();
         void SetupMETTriggerEfficiencyDetermination();
         void METTriggerEfficiencyDeterminationSelection();
+        void SetupGenHTAnalysis();
+        void GenHTAnalysisSelection();
+        void SetupRecoJetEfficiencyAnalysis();
+        void RecoJetEfficiencyAnalysisSelection();
         // INSERT YOUR SELECTION HERE
 
 
@@ -88,6 +94,12 @@ class LLGAnalysis {
         bool                    _writeOutputTree;
 
         // variables for the 'normal' output trees
+        vector<double> *recoCHSJet_pt;
+        vector<double> *recoCHSJet_eta;
+        vector<double> *recoCHSJet_phi;
+        vector<double> *recoNoCHSJet_pt;
+        vector<double> *recoNoCHSJet_eta;
+        vector<double> *recoNoCHSJet_phi;
         vector<vector<double> > *recoJet_pt; 
         vector<double> *recoJet_phi; 
         vector<double> *recoJet_eta; 
@@ -134,6 +146,43 @@ class LLGAnalysis {
         vector<vector<double> > *recoJet_const_closestVertex_d;
         vector<vector<int> > *recoJet_const_charge; 
         */
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_x; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_y; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_z; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_x; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_y;
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_z; 
+        std::vector<std::vector<double> >* recoCHSJet_const_pt;     
+        std::vector<std::vector<double> >* recoCHSJet_const_eta;     
+        std::vector<std::vector<double> >* recoCHSJet_const_phi;     
+        std::vector<std::vector<int> >*    recoCHSJet_const_charge;  
+        std::vector<std::vector<int> >*    recoCHSJet_const_fromPV;  
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_x; 
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_y; 
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_z; 
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dxy; 
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dz; 
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_d; 
+        
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_x; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_y; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_z; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_x; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_y; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_z;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pt;      
+        std::vector<std::vector<double> >* recoNoCHSJet_const_eta;     
+        std::vector<std::vector<double> >* recoNoCHSJet_const_phi;     
+        std::vector<std::vector<int> >*    recoNoCHSJet_const_charge;  
+        std::vector<std::vector<int> >*    recoNoCHSJet_const_fromPV;  
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_x; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_y; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_z; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dxy; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dz; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_d; 
+       
+ 
         vector<bool> *recoJet_isLeptonLike;
 
         vector<double> *vertex_x;
@@ -194,9 +243,29 @@ class LLGAnalysis {
         int NumberOfObservedInteractions;
         float NumberOfTrueInteractions;
         double generatorWeight;
+        double genLevel_HT;
+        bool applyGenLevelHTCut;
+        double GENLEVEL_HT_CUT;
         double lumiWeight;
         double pileupWeight;
         string GenFileName;
+
+
+        TFile *fTruth; 
+        TTree *tTruth;
+        int GenRunNumber, GenEventNumber, GenLumiBlock;
+        vector<double> *tmct_px; 
+        vector<double> *tmct_py; 
+        vector<double> *tmct_pz; 
+        vector<double> *tmct_vx; 
+        vector<double> *tmct_vy; 
+        vector<double> *tmct_vz; 
+        vector<double> *tmct_e; 
+        vector<int> *tmct_id; 
+        vector<int> *tmct_status; 
+        vector<int> *tmct_parent; 
+        vector<vector<int> > *tmct_daughters; 
+        int lastTruthEntry;
 
 
         string PUTYPE;

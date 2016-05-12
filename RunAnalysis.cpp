@@ -8,7 +8,7 @@ int main( int argc, char **argv ) {
     cout << "now initing" << endl;
     analysis->Init();
     cout << "starting evt loop" << endl;
-    analysis->RunEventLoop();
+    analysis->RunEventLoop( (argc > 2 ) ? atoi(argv[2]) : -1 );
     cout << "finishing " << endl;
     analysis->FinishRun();
     return 0;
