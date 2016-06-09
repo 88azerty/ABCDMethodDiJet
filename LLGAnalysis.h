@@ -181,7 +181,32 @@ class LLGAnalysis {
         std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dxy; 
         std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dz; 
         std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_d; 
-       
+   
+        std::vector<double>* tightJet_pt;
+        std::vector<double>* tightJet_eta;
+        std::vector<double>* tightJet_phi;
+
+        std::vector<double>* signalJets_pt;
+        std::vector<double>* signalJets_eta; 
+        std::vector<double>* signalJets_phi; 
+        std::vector<std::vector<double> >* signalJets_constVertex_x; 
+        std::vector<std::vector<double> >* signalJets_constVertex_y; 
+        std::vector<std::vector<double> >* signalJets_constVertex_z; 
+        std::vector<std::vector<double> >* signalJets_constVertexRef_x; 
+        std::vector<std::vector<double> >* signalJets_constVertexRef_y; 
+        std::vector<std::vector<double> >* signalJets_constVertexRef_z; 
+        std::vector<std::vector<double> >* signalJets_const_pt; 
+        std::vector<std::vector<int> >* signalJets_const_charge;
+        std::vector<std::vector<int> >* signalJets_const_fromPV; 
+        std::vector<std::vector<double> >* signalJets_const_pca0_x; 
+        std::vector<std::vector<double> >* signalJets_const_pca0_y;
+        std::vector<std::vector<double> >* signalJets_const_pca0_z; 
+        std::vector<std::vector<double> >* signalJets_const_eta;
+        std::vector<std::vector<double> >* signalJets_const_phi; 
+        double gluinoProdVertex_x, gluinoProdVertex_y, gluinoProdVertex_z; 
+        std::vector<double> *gluinoDecVertex_x;
+        std::vector<double> *gluinoDecVertex_y;
+        std::vector<double> *gluinoDecVertex_z;
  
         vector<bool> *recoJet_isLeptonLike;
 
