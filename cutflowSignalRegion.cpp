@@ -305,7 +305,8 @@ void LLGAnalysis::SignalRegionSelection() {
                     if( dist > maxDist ) maxDist = dist;
                 }
             }
-            if( met->at(SYSMET) > MET_CUT ) {
+            
+            if (sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET)) > MET_CUT ) {
                 _cutFlow.at("6_MET") += 1;
                 
 
