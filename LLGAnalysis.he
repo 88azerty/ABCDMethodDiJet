@@ -43,7 +43,9 @@ class LLGAnalysis {
         void setStyle(double ytoff = 1.0, bool marker = true, double left_margin = 0.15); 
         void MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, string triggerName = "");
         void FillEfficiencyHistograms();
-        
+
+        std::vector<double> CalculatePCA( std::vector<double> *refPoint, std::vector<double> *momentum, std::vector<double> *vertex );
+
         void SetupSignalRegion();
         void SignalRegionSelection();
         void SetupWJetsCR();
@@ -63,6 +65,14 @@ class LLGAnalysis {
         void SetupTriggerCheck();
         void TriggerCheckSelection();
         void SetupMETTriggerEfficiencyDetermination();
+        void METTriggerEfficiencyDeterminationSelection();
+        void SetupGenHTAnalysis();
+        void GenHTAnalysisSelection();
+        void SetupRecoJetEfficiencyAnalysis();
+        void RecoJetEfficiencyAnalysisSelection();
+        void SetupABCDMethod();
+        void ABCDMethodSelection();
+        void SetupABCDDijet();
         // INSERT YOUR SELECTION HERE
 
 
@@ -87,6 +97,12 @@ class LLGAnalysis {
         bool                    _writeOutputTree;
 
         // variables for the 'normal' output trees
+        vector<double> *recoCHSJet_pt;
+        vector<double> *recoCHSJet_eta;
+        vector<double> *recoCHSJet_phi;
+        vector<double> *recoNoCHSJet_pt;
+        vector<double> *recoNoCHSJet_eta;
+        vector<double> *recoNoCHSJet_phi;
         vector<vector<double> > *recoJet_pt; 
         vector<double> *recoJet_phi; 
         vector<double> *recoJet_eta; 
@@ -133,6 +149,68 @@ class LLGAnalysis {
         vector<vector<double> > *recoJet_const_closestVertex_d;
         vector<vector<int> > *recoJet_const_charge; 
         */
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_x; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_y; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_z; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_x; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_y;
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_z; 
+        std::vector<std::vector<double> >* recoCHSJet_const_pt;     
+        std::vector<std::vector<double> >* recoCHSJet_const_eta;     
+        std::vector<std::vector<double> >* recoCHSJet_const_phi;     
+        std::vector<std::vector<int> >*    recoCHSJet_const_charge;  
+        std::vector<std::vector<int> >*    recoCHSJet_const_fromPV;  
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_x; 
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_y; 
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_z; 
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dxy; 
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dz; 
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_d; 
+        
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_x; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_y; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_z; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_x; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_y; 
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_z;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pt;      
+        std::vector<std::vector<double> >* recoNoCHSJet_const_eta;     
+        std::vector<std::vector<double> >* recoNoCHSJet_const_phi;     
+        std::vector<std::vector<int> >*    recoNoCHSJet_const_charge;  
+        std::vector<std::vector<int> >*    recoNoCHSJet_const_fromPV;  
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_x; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_y; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_z; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dxy; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dz; 
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_d; 
+   
+        std::vector<double>* tightJet_pt;
+        std::vector<double>* tightJet_eta;
+        std::vector<double>* tightJet_phi;
+
+        std::vector<double>* signalJets_pt;
+        std::vector<double>* signalJets_eta; 
+        std::vector<double>* signalJets_phi; 
+        std::vector<std::vector<double> >* signalJets_constVertex_x; 
+        std::vector<std::vector<double> >* signalJets_constVertex_y; 
+        std::vector<std::vector<double> >* signalJets_constVertex_z; 
+        std::vector<std::vector<double> >* signalJets_constVertexRef_x; 
+        std::vector<std::vector<double> >* signalJets_constVertexRef_y; 
+        std::vector<std::vector<double> >* signalJets_constVertexRef_z; 
+        std::vector<std::vector<double> >* signalJets_const_pt; 
+        std::vector<std::vector<int> >* signalJets_const_charge;
+        std::vector<std::vector<int> >* signalJets_const_fromPV; 
+        std::vector<std::vector<double> >* signalJets_const_pca0_x; 
+        std::vector<std::vector<double> >* signalJets_const_pca0_y;
+        std::vector<std::vector<double> >* signalJets_const_pca0_z; 
+        std::vector<std::vector<double> >* signalJets_const_eta;
+        std::vector<std::vector<double> >* signalJets_const_phi; 
+        double gluinoProdVertex_x, gluinoProdVertex_y, gluinoProdVertex_z; 
+        std::vector<double> *gluinoDecVertex_x;
+        std::vector<double> *gluinoDecVertex_y;
+        std::vector<double> *gluinoDecVertex_z;
+ 
         vector<bool> *recoJet_isLeptonLike;
 
         vector<double> *vertex_x;
@@ -149,6 +227,7 @@ class LLGAnalysis {
         vector<double> *secVertex_y; 
         vector<double> *secVertex_z;
         vector<double> *secVertex_ndof;
+        vector<double> *secVertex_chi2;
         vector<double> *secVertex_pt;
         vector<double> *secVertex_dx;
         vector<double> *secVertex_dy; 
@@ -189,16 +268,47 @@ class LLGAnalysis {
         int RunNumber;
         int EventNumber;
         int LumiBlock;
+        int NumberOfObservedInteractions;
+        float NumberOfTrueInteractions;
         double generatorWeight;
+        double genLevel_HT;
+        bool applyGenLevelHTCut;
+        double GENLEVEL_HT_CUT;
+        double lumiWeight;
+        double pileupWeight;
         string GenFileName;
 
+
+        TFile *fTruth; 
+        TTree *tTruth;
+        int GenRunNumber, GenEventNumber, GenLumiBlock;
+        vector<double> *tmct_px; 
+        vector<double> *tmct_py; 
+        vector<double> *tmct_pz; 
+        vector<double> *tmct_vx; 
+        vector<double> *tmct_vy; 
+        vector<double> *tmct_vz; 
+        vector<double> *tmct_e; 
+        vector<int> *tmct_id; 
+        vector<int> *tmct_status; 
+        vector<int> *tmct_parent; 
+        vector<vector<int> > *tmct_daughters; 
+        int lastTruthEntry;
+
+
+        string PUTYPE;
         // variables for systematics
         int SYSJET;
         int SYSMET;
+        string SYSPILEUP;
+        string RUNSYS;
 
         ofstream passedLogFile;
 
         // variables for ROOT trees
+        double            _RT_generatorWeight;
+        double            _RT_pileupWeight;
+        double            _RT_lumiWeight;
         vector<double> *  _RT_met;
         vector<double> *  _RT_met_x;
         vector<double> *  _RT_met_y;
@@ -217,6 +327,7 @@ class LLGAnalysis {
         int               _RT_HLT_Mu50;
         int               _RT_HLT_Mu45_eta2p1;
         int               _RT_HLT_Ele27_WP85_Gsf;
+        int               _RT_HLT_Ele105_CaloIdVT_GsfTrkIdT;
         int               _RT_nVetoElectrons;
         int               _RT_nLooseElectrons;
         int               _RT_nMediumElectrons;
@@ -254,6 +365,15 @@ class LLGAnalysis {
         std::vector<std::string>*     _RT_AllTriggerNames;
         std::vector<int>*             _RT_AllTriggerBits;
 
+	long int RegionA;
+	long double RegionAWeighted;
+	long int RegionB;
+	long double RegionBWeighted;
+	long int RegionC;
+	long double RegionCWeighted;
+	long int RegionD;
+	long double RegionDWeighted;
+
         double evtWeight;
         double JET_PT_CUT_SV;
         double JET_PT_CUT_PV;
@@ -276,7 +396,13 @@ class LLGAnalysis {
         double TARGET_LUMI;
 
         bool applyEventWeights;
+        bool applyPileupWeights;
         
+
+        //for pileup reweighting
+        std::string PUFILE;
+        TH1D *hPU_weights;
+
         bool requireGenBranches; 
         vector<string> _plotFormats;
 

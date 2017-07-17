@@ -438,10 +438,9 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoElectron_isHEEP", &electron_isHEEP );
     _inputTree->SetBranchAddress("TriggerNames", &triggerNames );
     _inputTree->SetBranchAddress("TriggerBits", &triggerBits );
-    _inputTree->SetBranchAddress("TightJet_pt", &tightJet_pt );
-    _inputTree->SetBranchAddress("TightJet_eta", &tightJet_eta );
-    _inputTree->SetBranchAddress("TightJet_phi", &tightJet_phi );
-    _inputTree->SetBranchAddress("TightJet_pt", &tightJet_pt );
+//    _inputTree->SetBranchAddress("TightJet_pt", &tightJet_pt );
+//    _inputTree->SetBranchAddress("TightJet_eta", &tightJet_eta );
+//    _inputTree->SetBranchAddress("TightJet_phi", &tightJet_phi );
     _inputTree->SetBranchAddress("RecoJet_pt", &recoJet_pt );
     _inputTree->SetBranchAddress("RecoJet_eta", &recoJet_eta );
     _inputTree->SetBranchAddress("RecoJet_phi", &recoJet_phi );
@@ -499,47 +498,47 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("LuminosityBlock", &LumiBlock );
     _inputTree->SetBranchAddress("GeneratorWeight", &generatorWeight );
     _inputTree->SetBranchAddress("GenLevel_HT", &genLevel_HT );
-    _inputTree->SetBranchAddress("RecoCHSJet_pt", &recoCHSJet_pt );
-    _inputTree->SetBranchAddress("RecoCHSJet_eta", &recoCHSJet_eta );
-    _inputTree->SetBranchAddress("RecoCHSJet_phi", &recoCHSJet_phi );
-    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_x", &recoCHSJet_constVertex_x );
-    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_y", &recoCHSJet_constVertex_y );
-    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_z", &recoCHSJet_constVertex_z );
-    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_x", &recoCHSJet_constVertexRef_x );
-    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_y", &recoCHSJet_constVertexRef_y );
-    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_z", &recoCHSJet_constVertexRef_z );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_pt", &recoCHSJet_const_pt );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_charge", &recoCHSJet_const_charge );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_fromPV", &recoCHSJet_const_fromPV );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_x", &recoCHSJet_const_pca0_x );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_y", &recoCHSJet_const_pca0_y );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_z", &recoCHSJet_const_pca0_z );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dxy", &recoCHSJet_const_closestVertex_dxy );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dz", &recoCHSJet_const_closestVertex_dz );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_d", &recoCHSJet_const_closestVertex_d );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_eta", &recoCHSJet_const_eta );
-    _inputTree->SetBranchAddress("RecoCHSJet_const_phi", &recoCHSJet_const_phi ); 
+//    _inputTree->SetBranchAddress("RecoCHSJet_pt", &recoCHSJet_pt );
+//    _inputTree->SetBranchAddress("RecoCHSJet_eta", &recoCHSJet_eta );
+//    _inputTree->SetBranchAddress("RecoCHSJet_phi", &recoCHSJet_phi );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_x", &recoCHSJet_constVertex_x );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_y", &recoCHSJet_constVertex_y );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_z", &recoCHSJet_constVertex_z );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_x", &recoCHSJet_constVertexRef_x );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_y", &recoCHSJet_constVertexRef_y );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_z", &recoCHSJet_constVertexRef_z );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pt", &recoCHSJet_const_pt );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_charge", &recoCHSJet_const_charge );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_fromPV", &recoCHSJet_const_fromPV );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_x", &recoCHSJet_const_pca0_x );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_y", &recoCHSJet_const_pca0_y );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_z", &recoCHSJet_const_pca0_z );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dxy", &recoCHSJet_const_closestVertex_dxy );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dz", &recoCHSJet_const_closestVertex_dz );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_d", &recoCHSJet_const_closestVertex_d );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_eta", &recoCHSJet_const_eta );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_phi", &recoCHSJet_const_phi ); 
 
-    _inputTree->SetBranchAddress("RecoNoCHSJet_pt", &recoNoCHSJet_pt );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_eta", &recoNoCHSJet_eta );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_phi", &recoNoCHSJet_phi );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_x", &recoNoCHSJet_constVertex_x );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_y", &recoNoCHSJet_constVertex_y );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_z", &recoNoCHSJet_constVertex_z );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_x", &recoNoCHSJet_constVertexRef_x );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_y", &recoNoCHSJet_constVertexRef_y );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_z", &recoNoCHSJet_constVertexRef_z );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pt", &recoNoCHSJet_const_pt );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_charge", &recoNoCHSJet_const_charge );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_fromPV", &recoNoCHSJet_const_fromPV );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_x", &recoNoCHSJet_const_pca0_x );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_y", &recoNoCHSJet_const_pca0_y );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_z", &recoNoCHSJet_const_pca0_z );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dxy", &recoNoCHSJet_const_closestVertex_dxy );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dz", &recoNoCHSJet_const_closestVertex_dz );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_d", &recoNoCHSJet_const_closestVertex_d );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_eta", &recoNoCHSJet_const_eta );
-    _inputTree->SetBranchAddress("RecoNoCHSJet_const_phi", &recoNoCHSJet_const_phi ); 
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_pt", &recoNoCHSJet_pt );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_eta", &recoNoCHSJet_eta );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_phi", &recoNoCHSJet_phi );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_x", &recoNoCHSJet_constVertex_x );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_y", &recoNoCHSJet_constVertex_y );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_z", &recoNoCHSJet_constVertex_z );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_x", &recoNoCHSJet_constVertexRef_x );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_y", &recoNoCHSJet_constVertexRef_y );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_z", &recoNoCHSJet_constVertexRef_z );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pt", &recoNoCHSJet_const_pt );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_charge", &recoNoCHSJet_const_charge );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_fromPV", &recoNoCHSJet_const_fromPV );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_x", &recoNoCHSJet_const_pca0_x );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_y", &recoNoCHSJet_const_pca0_y );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_z", &recoNoCHSJet_const_pca0_z );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dxy", &recoNoCHSJet_const_closestVertex_dxy );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dz", &recoNoCHSJet_const_closestVertex_dz );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_d", &recoNoCHSJet_const_closestVertex_d );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_eta", &recoNoCHSJet_const_eta );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_phi", &recoNoCHSJet_const_phi ); 
     if( requireGenBranches ) {
       std::cout << "setting mct branch addresses" << std::endl;
       _inputTree->SetBranchAddress("GenLevel_px", &mct_px );
@@ -732,8 +731,8 @@ bool LLGAnalysis::Init() {
 
 
     // crate eps, png and pdf in the end
-    _plotFormats.push_back(".eps");
-    _plotFormats.push_back(".png");
+    //_plotFormats.push_back(".eps");
+    //_plotFormats.push_back(".png");
     _plotFormats.push_back(".pdf");
 
     // finally set the style
@@ -760,6 +759,8 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
     else if( SELECTION == "METTriggerEfficiencyDetermination" ) SetupMETTriggerEfficiencyDetermination();
     else if( SELECTION == "GenHTAnalysis" ) SetupGenHTAnalysis();
     else if( SELECTION == "RecoJetEfficiencyAnalysis" ) SetupRecoJetEfficiencyAnalysis();
+    else if( SELECTION == "ABCDMethod" ) SetupABCDMethod();
+    else if( SELECTION == "ABCDDijet" ) SetupABCDDijet();
     // SETUP YOUR SELECTION HERE
    
     else {
@@ -802,10 +803,22 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         else if( SELECTION == "METTriggerEfficiencyDetermination" ) METTriggerEfficiencyDeterminationSelection();
         else if( SELECTION == "GenHTAnalysis" ) GenHTAnalysisSelection();
         else if( SELECTION == "RecoJetEfficiencyAnalysis" ) RecoJetEfficiencyAnalysisSelection();
+        else if( SELECTION == "ABCDMethod" ) ABCDMethodSelection();
+        else if( SELECTION == "ABCDDijet" ) ABCDDijetSelection();
         // CALL YOUR SELECTION HERE
 
     }
     cout << endl;
+	passedLogFile.open("Regions.log",ios::app);
+	passedLogFile<<"*****"<<datasetName<<"*****"<<endl;
+	passedLogFile<<"RegionA: "<< RegionA<<endl;
+	passedLogFile<<"RegionB: "<< RegionB<<endl;
+	passedLogFile<<"RegionC: "<< RegionC<<endl;
+	passedLogFile<<"RegionD: "<< RegionD<<endl;
+	passedLogFile<<"RegionAWeighted: "<< RegionAWeighted<<endl;
+	passedLogFile<<"RegionBWeighted: "<< RegionBWeighted<<endl;
+	passedLogFile<<"RegionCWeighted: "<< RegionCWeighted<<endl;
+	passedLogFile<<"RegionDWeighted: "<< RegionDWeighted<<endl;
     return;
 
 }   

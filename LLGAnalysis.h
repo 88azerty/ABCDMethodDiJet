@@ -70,6 +70,10 @@ class LLGAnalysis {
         void GenHTAnalysisSelection();
         void SetupRecoJetEfficiencyAnalysis();
         void RecoJetEfficiencyAnalysisSelection();
+        void SetupABCDMethod();
+        void ABCDMethodSelection();
+        void SetupABCDDijet();
+        void ABCDDijetSelection();
         // INSERT YOUR SELECTION HERE
 
 
@@ -361,6 +365,15 @@ class LLGAnalysis {
         double            _RT_SV_MaxDistanceZ_Uncert;
         std::vector<std::string>*     _RT_AllTriggerNames;
         std::vector<int>*             _RT_AllTriggerBits;
+
+	long int RegionA;
+	long double RegionAWeighted;
+	long int RegionB;
+	long double RegionBWeighted;
+	long int RegionC;
+	long double RegionCWeighted;
+	long int RegionD;
+	long double RegionDWeighted;
 
         double evtWeight;
         double JET_PT_CUT_SV;

@@ -24,7 +24,9 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     MET_CUT = 210.;
     PROC_XSEC = 1.;
     PROC_NTOT = 1.;
+    GENLEVEL_HT_CUT = 100;
     applyEventWeights = false;
+    applyPileupWeights = false;
     TARGET_LUMI = 1000.;
     SELECTION = "SignalRegion";
     metadataFileName = "Configuration/DatasetMetadata.txt";
@@ -32,35 +34,80 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
     requireGenBranches = false;
     GenFileName = "";
     _writeOutputTree = true;
+    PUTYPE = "True";
+    applyGenLevelHTCut = false;
+
+    RUNSYS = "NOMINAL";
     SYSMET = 0;
     SYSJET = 0;
+    SYSPILEUP = "NOMINAL";
 
     ifstream configFile( configFileName, ios::in );
     while( configFile.good() ) {
         string key, value;
         configFile >> key >> ws >> value;
         if( configFile.eof() ) break;
-        if( key == "InputFile"         ) _inputFileNames.push_back( value ); 
-        if( key == "InputTree"         ) _inputTreeName = value; 
-        if( key == "JET_PT_CUT_SV"     ) JET_PT_CUT_SV = atof(value.c_str());
-        if( key == "JET_PT_CUT_PV"     ) JET_PT_CUT_PV = atof(value.c_str());
-        if( key == "JET_ETA_CUT"       ) JET_ETA_CUT = atof(value.c_str());
-        if( key == "MUON_PT_CUT"       ) MUON_PT_CUT = atof(value.c_str()); 
-        if( key == "ELECTRON_PT_CUT"   ) ELECTRON_PT_CUT = atof(value.c_str()); 
-        if( key == "MET_CUT"           ) MET_CUT = atof(value.c_str()); 
-        //if( key == "PROC_XSEC"         ) PROC_XSEC = atof(value.c_str());
-        //if( key == "PROC_NTOT"         ) PROC_NTOT = atof(value.c_str());
-        if( key == "TARGET_LUMI"       ) TARGET_LUMI = atof(value.c_str());
-        if( key == "ApplyEventWeights" ) applyEventWeights = ( atoi(value.c_str()) == 1 );
-        if( key == "Selection"         ) SELECTION = value;
-        if( key == "MetadataFileName"  ) metadataFileName = value;
-        if( key == "DatasetName"       ) datasetName = value;
-        if( key == "WriteOutputTree"   ) _writeOutputTree = (bool)(atoi(value.c_str()));
-        if( key == "LEADING_SV_JET_CUT" ) LEADING_SV_JET_CUT = atof(value.c_str());
-        if( key == "MJJ_CUT"           ) MJJ_CUT = atof(value.c_str());
-        if( key == "RequireGenBranches" ) requireGenBranches = (bool)(atoi(value.c_str()));
-        if( key == "GenFileName" )      GenFileName = value;
+        if( key == "InputFile"          )   _inputFileNames.push_back( value ); 
+        if( key == "InputTree"          )   _inputTreeName = value; 
+        if( key == "JET_PT_CUT_SV"      )   JET_PT_CUT_SV = atof(value.c_str());
+        if( key == "JET_PT_CUT_PV"      )   JET_PT_CUT_PV = atof(value.c_str());
+        if( key == "JET_ETA_CUT"        )   JET_ETA_CUT = atof(value.c_str());
+        if( key == "MUON_PT_CUT"        )   MUON_PT_CUT = atof(value.c_str()); 
+        if( key == "ELECTRON_PT_CUT"    )   ELECTRON_PT_CUT = atof(value.c_str()); 
+        if( key == "MET_CUT"            )   MET_CUT = atof(value.c_str()); 
+        if( key == "TARGET_LUMI"        )   TARGET_LUMI = atof(value.c_str());
+        if( key == "ApplyEventWeights"  )   applyEventWeights = ( atoi(value.c_str()) == 1 );
+        if( key == "ApplyPileupWeights" )   applyPileupWeights = ( atoi(value.c_str()) == 1 );
+        if( key == "PileupFileName"     )   PUFILE = value;
+        if( key == "PileupType"         )   PUTYPE = value;
+        if( key == "Selection"          )   SELECTION = value;
+        if( key == "MetadataFileName"   )   metadataFileName = value;
+        if( key == "DatasetName"        )   datasetName = value;
+        if( key == "WriteOutputTree"    )   _writeOutputTree = (bool)(atoi(value.c_str()));
+        if( key == "LEADING_SV_JET_CUT" )   LEADING_SV_JET_CUT = atof(value.c_str());
+        if( key == "MJJ_CUT"            )   MJJ_CUT = atof(value.c_str());
+        if( key == "RequireGenBranches" )   requireGenBranches = (bool)(atoi(value.c_str()));
+        if( key == "GenFileName"        )   GenFileName = value;
+        if( key == "SystUncert"         )   RUNSYS = value;
+        if( key == "GENLEVEL_HT_CUT"    )   GENLEVEL_HT_CUT = atof(value.c_str());
     }
+    
+    if( RUNSYS == "JECUP"   ) { SYSJET = 1; SYSMET = 3; }
+    if( RUNSYS == "JECDOWN" ) { SYSJET = 2; SYSMET = 4; }
+    if( RUNSYS == "UNCUP"   ) { SYSMET = 11; }
+    if( RUNSYS == "UNCDOWN" ) { SYSMET = 12; }
+    if( RUNSYS == "PUUP"    ) { SYSPILEUP = "MBXSUP"; }
+    if( RUNSYS == "PUDOWN"  ) { SYSPILEUP = "MBXSDOWN"; }
+
+    if( datasetName == "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" ) applyGenLevelHTCut = true;
+
+    // generate the pileup reweighting histogram 
+    if( applyPileupWeights ) {
+      
+      string mcHistogramName   = "Distribution_" + PUTYPE + "_" + datasetName;
+      string dataHistogramName = "Distribution_Data_" + PUTYPE + "_" + SYSPILEUP;
+      TFile *fPU = new TFile( PUFILE.c_str(), "OPEN" );
+      if( !fPU || fPU->IsZombie() ) {
+        std::cout << "FATAL: COULDN'T OPEN PILEUPFILE: " << PUFILE << std::endl;
+        exit(-1);
+      }
+
+      
+      TH1D *hdata = (TH1D*)fPU->Get(dataHistogramName.c_str());
+      TH1D *hmc = (TH1D*)fPU->Get(mcHistogramName.c_str());
+      if( !hdata || !hmc ) {
+        std::cout << "FATAL: COULDN'T LOAD HISTOGRAM(S): Distribution_Data or " << mcHistogramName << std::endl;
+      }
+      hdata->Scale( 1./hdata->Integral() );
+      hmc->Scale( 1./hmc->Integral() );
+      hPU_weights = new TH1D("PileupWeights", "PileupWeights", hdata->GetXaxis()->GetNbins(), hdata->GetXaxis()->GetBinLowEdge(1), hdata->GetXaxis()->GetBinLowEdge( hdata->GetXaxis()->GetNbins() + 1) );
+      for( int iBin = 1; iBin <= hdata->GetXaxis()->GetNbins(); ++iBin ) {
+        hPU_weights->SetBinContent( iBin, hdata->GetBinContent(iBin) / hmc->GetBinContent(iBin) );
+      }
+
+    }
+
+
     _outputFileName = datasetName + "_tree.root";
     _RT_outputFileName = datasetName + "_ROOTTree.root";
     _outputFile = new TFile( _outputFileName.c_str(), "RECREATE" );
@@ -89,8 +136,8 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
       cout << "Did not find dataset " << datasetName << " in " << metadataFileName << ". Using standard values for xsec and ntot: " << PROC_XSEC << " " << PROC_NTOT << endl;
     }
     generatorWeight = 1.;
-    evtWeight = applyEventWeights ? PROC_XSEC/PROC_NTOT * TARGET_LUMI : 1.;
-    std::cout << "evtWeight is " << evtWeight << std::endl;
+    lumiWeight = applyEventWeights ? PROC_XSEC/PROC_NTOT * TARGET_LUMI : 1.;
+    std::cout << "lumiWeight is " << lumiWeight << std::endl;
 }
 
 void LLGAnalysis::MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, string triggerName ) {
@@ -194,11 +241,12 @@ bool LLGAnalysis::Init() {
     }
 
     // create the histograms and add them to the list
+    /*
     makeHist( "MET_allEvents", 50, 0., 2000., "MET [GeV]", "Number of Events" );
     makeHist( "MET_HLT_PFMET170_NoiseCleaned_v1", 50, 0., 2000., "MET [GeV]", "Number of Events" );
     makeHist( "jet1_pt_allEvents", 50, 0., 1000., "Leading Jet p_{T} [GeV]", "Number of Events");
     makeHist( "jet1_pt_HLT_PFJet260_v1", 50, 0., 1000., "Leading Jet p_{T} [GeV]", "Number of Events");
-
+    */
     // allocate memory for all the variables
     recoJet_pt = new vector<vector<double> >;
     recoJet_phi = new vector<double>;
@@ -211,6 +259,73 @@ bool LLGAnalysis::Init() {
     recoJet_nConsidered = new vector<int>;
     recoJet_averageDistance = new vector<double>;
     recoJet_rmsDistance = new vector<double>;
+
+    tightJet_pt = new vector<double>;
+    tightJet_eta = new vector<double>;
+    tightJet_phi = new vector<double>;
+
+    recoCHSJet_pt = new std::vector<double>;
+    recoCHSJet_eta = new std::vector<double>;
+    recoCHSJet_phi = new std::vector<double>;
+    recoCHSJet_constVertex_x = new std::vector<std::vector<double> >;
+    recoCHSJet_constVertex_y = new std::vector<std::vector<double> >;
+    recoCHSJet_constVertex_z = new std::vector<std::vector<double> >;
+    recoCHSJet_constVertexRef_x = new std::vector<std::vector<double> >;
+    recoCHSJet_constVertexRef_y = new std::vector<std::vector<double> >;
+    recoCHSJet_constVertexRef_z = new std::vector<std::vector<double> >;
+    recoCHSJet_const_pt      = new std::vector<std::vector<double> >;
+    recoCHSJet_const_eta     = new std::vector<std::vector<double> >;
+    recoCHSJet_const_phi     = new std::vector<std::vector<double> >;
+    recoCHSJet_const_charge  = new std::vector<std::vector<int> >;
+    recoCHSJet_const_fromPV  = new std::vector<std::vector<int> >;
+    recoCHSJet_const_pca0_x = new std::vector<std::vector<double> >;
+    recoCHSJet_const_pca0_y = new std::vector<std::vector<double> >;
+    recoCHSJet_const_pca0_z = new std::vector<std::vector<double> >;
+    recoCHSJet_const_closestVertex_dxy = new std::vector<std::vector<double> >;
+    recoCHSJet_const_closestVertex_dz = new std::vector<std::vector<double> >;
+    recoCHSJet_const_closestVertex_d = new std::vector<std::vector<double> >;
+   
+    recoNoCHSJet_pt = new std::vector<double>;
+    recoNoCHSJet_eta = new std::vector<double>;
+    recoNoCHSJet_phi = new std::vector<double>;
+    recoNoCHSJet_constVertex_x = new std::vector<std::vector<double> >;
+    recoNoCHSJet_constVertex_y = new std::vector<std::vector<double> >;
+    recoNoCHSJet_constVertex_z = new std::vector<std::vector<double> >;
+    recoNoCHSJet_constVertexRef_x = new std::vector<std::vector<double> >;
+    recoNoCHSJet_constVertexRef_y = new std::vector<std::vector<double> >;
+    recoNoCHSJet_constVertexRef_z = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_pt      = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_eta     = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_phi     = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_charge  = new std::vector<std::vector<int> >;
+    recoNoCHSJet_const_fromPV  = new std::vector<std::vector<int> >;
+    recoNoCHSJet_const_pca0_x = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_pca0_y = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_pca0_z = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_closestVertex_dxy = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_closestVertex_dz = new std::vector<std::vector<double> >;
+    recoNoCHSJet_const_closestVertex_d = new std::vector<std::vector<double> >;
+      
+    signalJets_pt = new std::vector<double>; 
+    signalJets_eta = new std::vector<double>;
+    signalJets_phi = new std::vector<double>;
+    signalJets_constVertex_x = new std::vector<std::vector<double> >;
+    signalJets_constVertex_y = new std::vector<std::vector<double> >;
+    signalJets_constVertex_z = new std::vector<std::vector<double> >;
+    signalJets_constVertexRef_x = new std::vector<std::vector<double> >;
+    signalJets_constVertexRef_y = new std::vector<std::vector<double> >;
+    signalJets_constVertexRef_z = new std::vector<std::vector<double> >;
+    signalJets_const_pt = new std::vector<std::vector<double> >;
+    signalJets_const_charge = new std::vector<std::vector<int> >;
+    signalJets_const_fromPV = new std::vector<std::vector<int> >;
+    signalJets_const_pca0_x = new std::vector<std::vector<double> >;
+    signalJets_const_pca0_y = new std::vector<std::vector<double> >;
+    signalJets_const_pca0_z = new std::vector<std::vector<double> >;
+    signalJets_const_eta = new std::vector<std::vector<double> >;
+    signalJets_const_phi = new std::vector<std::vector<double> >;
+    gluinoDecVertex_x = new std::vector<double>;
+    gluinoDecVertex_y = new std::vector<double>;
+    gluinoDecVertex_z = new std::vector<double>;
 
     muon_px = new vector<double>;
     muon_py = new vector<double>;
@@ -272,6 +387,7 @@ bool LLGAnalysis::Init() {
     secVertex_dy = new vector<double>;
     secVertex_dz = new vector<double>;
     secVertex_pt = new vector<double>;
+    secVertex_chi2 = new vector<double>;
     secVertex_ndof = new vector<double>;
  
     met = new vector<double>;
@@ -322,6 +438,9 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoElectron_isHEEP", &electron_isHEEP );
     _inputTree->SetBranchAddress("TriggerNames", &triggerNames );
     _inputTree->SetBranchAddress("TriggerBits", &triggerBits );
+//    _inputTree->SetBranchAddress("TightJet_pt", &tightJet_pt );
+//    _inputTree->SetBranchAddress("TightJet_eta", &tightJet_eta );
+//    _inputTree->SetBranchAddress("TightJet_phi", &tightJet_phi );
     _inputTree->SetBranchAddress("RecoJet_pt", &recoJet_pt );
     _inputTree->SetBranchAddress("RecoJet_eta", &recoJet_eta );
     _inputTree->SetBranchAddress("RecoJet_phi", &recoJet_phi );
@@ -347,6 +466,8 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_dz", &recoJet_const_closestVertex_dz );
     _inputTree->SetBranchAddress("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
     */
+    _inputTree->SetBranchAddress("PUINFO_NumberOfTrueInteractions", &NumberOfTrueInteractions );
+    _inputTree->SetBranchAddress("PUINFO_NumberOfObservedInteractiosn", &NumberOfObservedInteractions );
     _inputTree->SetBranchAddress("RecoVertex_x", &vertex_x );
     _inputTree->SetBranchAddress("RecoVertex_y", &vertex_y );
     _inputTree->SetBranchAddress("RecoVertex_z", &vertex_z );
@@ -364,6 +485,7 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("RecoSecVertex_zError", &secVertex_dz );
     _inputTree->SetBranchAddress("RecoSecVertex_pt", &secVertex_pt );
     _inputTree->SetBranchAddress("RecoSecVertex_ndof", &secVertex_ndof );
+    _inputTree->SetBranchAddress("RecoSecVertex_chi2", &secVertex_chi2 );
     _inputTree->SetBranchAddress("TriggerObject_TriggerName", &to_TriggerNames );
     _inputTree->SetBranchAddress("TriggerObject_pt", &to_pt );
     _inputTree->SetBranchAddress("TriggerObject_eta", &to_eta );
@@ -375,6 +497,48 @@ bool LLGAnalysis::Init() {
     _inputTree->SetBranchAddress("EventNumber", &EventNumber );
     _inputTree->SetBranchAddress("LuminosityBlock", &LumiBlock );
     _inputTree->SetBranchAddress("GeneratorWeight", &generatorWeight );
+    _inputTree->SetBranchAddress("GenLevel_HT", &genLevel_HT );
+//    _inputTree->SetBranchAddress("RecoCHSJet_pt", &recoCHSJet_pt );
+//    _inputTree->SetBranchAddress("RecoCHSJet_eta", &recoCHSJet_eta );
+//    _inputTree->SetBranchAddress("RecoCHSJet_phi", &recoCHSJet_phi );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_x", &recoCHSJet_constVertex_x );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_y", &recoCHSJet_constVertex_y );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertex_z", &recoCHSJet_constVertex_z );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_x", &recoCHSJet_constVertexRef_x );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_y", &recoCHSJet_constVertexRef_y );
+//    _inputTree->SetBranchAddress("RecoCHSJet_constVertexRef_z", &recoCHSJet_constVertexRef_z );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pt", &recoCHSJet_const_pt );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_charge", &recoCHSJet_const_charge );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_fromPV", &recoCHSJet_const_fromPV );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_x", &recoCHSJet_const_pca0_x );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_y", &recoCHSJet_const_pca0_y );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_pca0_z", &recoCHSJet_const_pca0_z );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dxy", &recoCHSJet_const_closestVertex_dxy );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dz", &recoCHSJet_const_closestVertex_dz );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_d", &recoCHSJet_const_closestVertex_d );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_eta", &recoCHSJet_const_eta );
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_phi", &recoCHSJet_const_phi ); 
+
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_pt", &recoNoCHSJet_pt );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_eta", &recoNoCHSJet_eta );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_phi", &recoNoCHSJet_phi );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_x", &recoNoCHSJet_constVertex_x );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_y", &recoNoCHSJet_constVertex_y );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertex_z", &recoNoCHSJet_constVertex_z );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_x", &recoNoCHSJet_constVertexRef_x );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_y", &recoNoCHSJet_constVertexRef_y );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_constVertexRef_z", &recoNoCHSJet_constVertexRef_z );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pt", &recoNoCHSJet_const_pt );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_charge", &recoNoCHSJet_const_charge );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_fromPV", &recoNoCHSJet_const_fromPV );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_x", &recoNoCHSJet_const_pca0_x );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_y", &recoNoCHSJet_const_pca0_y );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_pca0_z", &recoNoCHSJet_const_pca0_z );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dxy", &recoNoCHSJet_const_closestVertex_dxy );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dz", &recoNoCHSJet_const_closestVertex_dz );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_d", &recoNoCHSJet_const_closestVertex_d );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_eta", &recoNoCHSJet_const_eta );
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_phi", &recoNoCHSJet_const_phi ); 
     if( requireGenBranches ) {
       std::cout << "setting mct branch addresses" << std::endl;
       _inputTree->SetBranchAddress("GenLevel_px", &mct_px );
@@ -391,86 +555,124 @@ bool LLGAnalysis::Init() {
       _inputTree->SetBranchAddress("GenLevel_ParentE", &mct_parentE );
     }
 
-    _outputTree->Branch("RecoMuon_px", &muon_px );
-    _outputTree->Branch("RecoMuon_py", &muon_py );
-    _outputTree->Branch("RecoMuon_pz", &muon_pz );
-    _outputTree->Branch("RecoMuon_eta", &muon_eta );
-    _outputTree->Branch("RecoMuon_phi", &muon_phi );
-    _outputTree->Branch("RecoMuon_iso", &muon_iso );
-    _outputTree->Branch("RecoMuon_isLooseMuon", &muon_isLooseMuon );
-    _outputTree->Branch("RecoMuon_isTightMuon", &muon_isTightMuon );
-    _outputTree->Branch("RecoElectron_px", &electron_px );
-    _outputTree->Branch("RecoElectron_py", &electron_py );
-    _outputTree->Branch("RecoElectron_pz", &electron_pz );
-    _outputTree->Branch("RecoElectron_eta", &electron_eta );
-    _outputTree->Branch("RecoElectron_phi", &electron_phi );
-    _outputTree->Branch("RecoElectron_iso", &electron_iso );
-    _outputTree->Branch("RecoElectron_isVeto", &electron_isVeto );
-    _outputTree->Branch("RecoElectron_isLoose", &electron_isLoose );
-    _outputTree->Branch("RecoElectron_isMedium", &electron_isMedium );
-    _outputTree->Branch("RecoElectron_isTight", &electron_isTight );
-    _outputTree->Branch("RecoElectron_isHEEP", &electron_isHEEP );
-    _outputTree->Branch("TriggerNames", &triggerNames );
-    _outputTree->Branch("TriggerBits", &triggerBits );
-    _outputTree->Branch("RecoJet_pt", &recoJet_pt );
-    _outputTree->Branch("RecoJet_eta", &recoJet_eta );
-    _outputTree->Branch("RecoJet_phi", &recoJet_phi );
-    _outputTree->Branch("RecoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags", &recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags );
-    _outputTree->Branch("RecoJet_btag_jetBProbabilityBJetTags", &recoJet_btag_jetBProbabilityBJetTags );
-    _outputTree->Branch("RecoJet_btag_jetProbabilityBJetTags", &recoJet_btag_jetProbabilityBJetTags );
-    _outputTree->Branch("RecoJet_btag_trackCountingHighPurBJetTags", &recoJet_btag_trackCountingHighPurBJetTags );
-    _outputTree->Branch("RecoJet_btag_trackCountingHighEffBJetTags", &recoJet_btag_trackCountingHighEffBJetTags );
-    /*
-    _outputTree->Branch("RecoJet_constVertex_x", &recoJet_constVertex_x );
-    _outputTree->Branch("RecoJet_constVertex_y", &recoJet_constVertex_y );
-    _outputTree->Branch("RecoJet_constVertex_z", &recoJet_constVertex_z );
-    _outputTree->Branch("RecoJet_const_pt", &recoJet_const_pt );
-    _outputTree->Branch("RecoJet_const_charge", &recoJet_const_charge );
-    _outputTree->Branch("RecoJet_const_closestVertex_dxy", &recoJet_const_closestVertex_dxy );
-    _outputTree->Branch("RecoJet_const_closestVertex_dz", &recoJet_const_closestVertex_dz );
-    _outputTree->Branch("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
-    */
-    _outputTree->Branch("RecoVertex_x", &vertex_x );
-    _outputTree->Branch("RecoVertex_y", &vertex_y );
-    _outputTree->Branch("RecoVertex_z", &vertex_z );
-    _outputTree->Branch("RecoVertex_dx", &vertex_dx );
-    _outputTree->Branch("RecoVertex_dy", &vertex_dy );
-    _outputTree->Branch("RecoVertex_dz", &vertex_dz );
-    _outputTree->Branch("RecoVertex_nTracks", &vertex_nTracks );
-    _outputTree->Branch("RecoVertex_pt", &vertex_pt );
-    _outputTree->Branch("RecoVertex_ndof", &vertex_ndof );
-    _outputTree->Branch("RecoSecVertex_x", &secVertex_x );
-    _outputTree->Branch("RecoSecVertex_y", &secVertex_y );
-    _outputTree->Branch("RecoSecVertex_z", &secVertex_z );
-    _outputTree->Branch("RecoSecVertex_pt", &secVertex_pt );
-    _outputTree->Branch("RecoSecVertex_ndof", &secVertex_ndof );
-    _outputTree->Branch("RecoSecVertex_dx", &secVertex_dx );
-    _outputTree->Branch("RecoSecVertex_dy", &secVertex_dy );
-    _outputTree->Branch("RecoSecVertex_dz", &secVertex_dz );
-    _outputTree->Branch("MET", &met );
-    _outputTree->Branch("MET_x", &met_x );
-    _outputTree->Branch("MET_y", &met_y );
-    if( requireGenBranches ) {
-      _outputTree->Branch("GenLevel_px", &mct_px );
-      _outputTree->Branch("GenLevel_py", &mct_py );
-      _outputTree->Branch("GenLevel_pz", &mct_pz );
-      _outputTree->Branch("GenLevel_E", &mct_e );
-      _outputTree->Branch("GenLevel_PDGID", &mct_id );
-      _outputTree->Branch("GenLevel_status", &mct_status );
-      _outputTree->Branch("GenLevel_ParentId", &mct_parentId );
-      _outputTree->Branch("GenLevel_ParentStatus", &mct_parentStatus );
-      _outputTree->Branch("GenLevel_ParentPx", &mct_parentPx );
-      _outputTree->Branch("GenLevel_ParentPy", &mct_parentPy );
-      _outputTree->Branch("GenLevel_ParentPz", &mct_parentPz );
-      _outputTree->Branch("GenLevel_ParentE", &mct_parentE );
+
+    if( SELECTION != "RecoJetEfficiencyAnalysis" ) {
+      _outputTree->Branch("RecoMuon_px", &muon_px );
+      _outputTree->Branch("RecoMuon_py", &muon_py );
+      _outputTree->Branch("RecoMuon_pz", &muon_pz );
+      _outputTree->Branch("RecoMuon_eta", &muon_eta );
+      _outputTree->Branch("RecoMuon_phi", &muon_phi );
+      _outputTree->Branch("RecoMuon_iso", &muon_iso );
+      _outputTree->Branch("RecoMuon_isLooseMuon", &muon_isLooseMuon );
+      _outputTree->Branch("RecoMuon_isTightMuon", &muon_isTightMuon );
+      _outputTree->Branch("RecoElectron_px", &electron_px );
+      _outputTree->Branch("RecoElectron_py", &electron_py );
+      _outputTree->Branch("RecoElectron_pz", &electron_pz );
+      _outputTree->Branch("RecoElectron_eta", &electron_eta );
+      _outputTree->Branch("RecoElectron_phi", &electron_phi );
+      _outputTree->Branch("RecoElectron_iso", &electron_iso );
+      _outputTree->Branch("RecoElectron_isVeto", &electron_isVeto );
+      _outputTree->Branch("RecoElectron_isLoose", &electron_isLoose );
+      _outputTree->Branch("RecoElectron_isMedium", &electron_isMedium );
+      _outputTree->Branch("RecoElectron_isTight", &electron_isTight );
+      _outputTree->Branch("RecoElectron_isHEEP", &electron_isHEEP );
+      _outputTree->Branch("TriggerNames", &triggerNames );
+      _outputTree->Branch("TriggerBits", &triggerBits );
+      _outputTree->Branch("RecoJet_pt", &recoJet_pt );
+      _outputTree->Branch("RecoJet_eta", &recoJet_eta );
+      _outputTree->Branch("RecoJet_phi", &recoJet_phi );
+      _outputTree->Branch("RecoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags", &recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags );
+      _outputTree->Branch("RecoJet_btag_jetBProbabilityBJetTags", &recoJet_btag_jetBProbabilityBJetTags );
+      _outputTree->Branch("RecoJet_btag_jetProbabilityBJetTags", &recoJet_btag_jetProbabilityBJetTags );
+      _outputTree->Branch("RecoJet_btag_trackCountingHighPurBJetTags", &recoJet_btag_trackCountingHighPurBJetTags );
+      _outputTree->Branch("RecoJet_btag_trackCountingHighEffBJetTags", &recoJet_btag_trackCountingHighEffBJetTags );
+      /*
+      _outputTree->Branch("RecoJet_constVertex_x", &recoJet_constVertex_x );
+      _outputTree->Branch("RecoJet_constVertex_y", &recoJet_constVertex_y );
+      _outputTree->Branch("RecoJet_constVertex_z", &recoJet_constVertex_z );
+      _outputTree->Branch("RecoJet_const_pt", &recoJet_const_pt );
+      _outputTree->Branch("RecoJet_const_charge", &recoJet_const_charge );
+      _outputTree->Branch("RecoJet_const_closestVertex_dxy", &recoJet_const_closestVertex_dxy );
+      _outputTree->Branch("RecoJet_const_closestVertex_dz", &recoJet_const_closestVertex_dz );
+      _outputTree->Branch("RecoJet_const_closestVertex_d", &recoJet_const_closestVertex_d );
+      */
+      _outputTree->Branch("RecoVertex_x", &vertex_x );
+      _outputTree->Branch("RecoVertex_y", &vertex_y );
+      _outputTree->Branch("RecoVertex_z", &vertex_z );
+      _outputTree->Branch("RecoVertex_dx", &vertex_dx );
+      _outputTree->Branch("RecoVertex_dy", &vertex_dy );
+      _outputTree->Branch("RecoVertex_dz", &vertex_dz );
+      _outputTree->Branch("RecoVertex_nTracks", &vertex_nTracks );
+      _outputTree->Branch("RecoVertex_pt", &vertex_pt );
+      _outputTree->Branch("RecoVertex_ndof", &vertex_ndof );
+      _outputTree->Branch("RecoSecVertex_x", &secVertex_x );
+      _outputTree->Branch("RecoSecVertex_y", &secVertex_y );
+      _outputTree->Branch("RecoSecVertex_z", &secVertex_z );
+      _outputTree->Branch("RecoSecVertex_pt", &secVertex_pt );
+      _outputTree->Branch("RecoSecVertex_ndof", &secVertex_ndof );
+      _outputTree->Branch("RecoSecVertex_dx", &secVertex_dx );
+      _outputTree->Branch("RecoSecVertex_dy", &secVertex_dy );
+      _outputTree->Branch("RecoSecVertex_dz", &secVertex_dz );
+      _outputTree->Branch("MET", &met );
+      _outputTree->Branch("MET_x", &met_x );
+      _outputTree->Branch("MET_y", &met_y );
+      if( requireGenBranches ) {
+        _outputTree->Branch("GenLevel_px", &mct_px );
+        _outputTree->Branch("GenLevel_py", &mct_py );
+        _outputTree->Branch("GenLevel_pz", &mct_pz );
+        _outputTree->Branch("GenLevel_E", &mct_e );
+        _outputTree->Branch("GenLevel_PDGID", &mct_id );
+        _outputTree->Branch("GenLevel_status", &mct_status );
+        _outputTree->Branch("GenLevel_ParentId", &mct_parentId );
+        _outputTree->Branch("GenLevel_ParentStatus", &mct_parentStatus );
+        _outputTree->Branch("GenLevel_ParentPx", &mct_parentPx );
+        _outputTree->Branch("GenLevel_ParentPy", &mct_parentPy );
+        _outputTree->Branch("GenLevel_ParentPz", &mct_parentPz );
+        _outputTree->Branch("GenLevel_ParentE", &mct_parentE );
+      }
     }
-  
+    else {
+      _outputTree->Branch("SignalJets_pt", &signalJets_pt );
+      _outputTree->Branch("SignalJets_eta", &signalJets_eta );
+      _outputTree->Branch("SignalJets_phi", &signalJets_phi );
+      _outputTree->Branch("SignalJets_constVertex_x", &signalJets_constVertex_x );
+      _outputTree->Branch("SignalJets_constVertex_y", &signalJets_constVertex_y );
+      _outputTree->Branch("SignalJets_constVertex_z", &signalJets_constVertex_z );
+      _outputTree->Branch("SignalJets_constVertexRef_x", &signalJets_constVertexRef_x );
+      _outputTree->Branch("SignalJets_constVertexRef_y", &signalJets_constVertexRef_y );
+      _outputTree->Branch("SignalJets_constVertexRef_z", &signalJets_constVertexRef_z );
+      _outputTree->Branch("SignalJets_const_pt", &signalJets_const_pt );
+      _outputTree->Branch("SignalJets_const_charge", &signalJets_const_charge );
+      _outputTree->Branch("SignalJets_const_fromPV", &signalJets_const_fromPV );
+      _outputTree->Branch("SignalJets_const_pca0_x", &signalJets_const_pca0_x );
+      _outputTree->Branch("SignalJets_const_pca0_y", &signalJets_const_pca0_y );
+      _outputTree->Branch("SignalJets_const_pca0_z", &signalJets_const_pca0_z );
+      _outputTree->Branch("SignalJets_const_eta", &signalJets_const_eta );
+      _outputTree->Branch("SignalJets_const_phi", &signalJets_const_phi );
+      _outputTree->Branch("RecoPV_x", &vertex_x );
+      _outputTree->Branch("RecoPV_y", &vertex_y );
+      _outputTree->Branch("RecoPV_z", &vertex_z );
+      _outputTree->Branch("RecoSV_x", &secVertex_x );
+      _outputTree->Branch("RecoSV_y", &secVertex_y );
+      _outputTree->Branch("RecoSV_z", &secVertex_z );
+      _outputTree->Branch("EventNumber", &EventNumber );
+      _outputTree->Branch("LuminosityBlock", &LumiBlock );
+      _outputTree->Branch("RunNumber", &RunNumber );
+      _outputTree->Branch("GluinoProductionVertex_x", &gluinoProdVertex_x );
+      _outputTree->Branch("GluinoProductionVertex_y", &gluinoProdVertex_y );
+      _outputTree->Branch("GluinoProductionVertex_z", &gluinoProdVertex_z );
+      _outputTree->Branch("GluinoDecayVertex_x", &gluinoDecVertex_x );
+      _outputTree->Branch("GluinoDecayVertex_y", &gluinoDecVertex_y );
+      _outputTree->Branch("GluinoDecayVertex_z", &gluinoDecVertex_z );
+    }
     // ROOT Trees:
     if( SELECTION == "MakeROOTTrees" && _inputTree->GetEntries() > 0 ) { 
       //_inputTree->GetEntry(0);
       //for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
       //  _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
       //}
+      _RT_outputTree->Branch("GeneratorWeight", &_RT_generatorWeight );
+      _RT_outputTree->Branch("PileupWeight", &_RT_pileupWeight );
       _RT_outputTree->Branch("LeadingTightMuonPt", &_RT_LeadingMuonPt );
       _RT_outputTree->Branch("LeadingTightMuonIso", &_RT_LeadingMuonIso );
       _RT_outputTree->Branch("LeadingTightElectronPt", &_RT_LeadingElectronPt );
@@ -479,6 +681,7 @@ bool LLGAnalysis::Init() {
       _RT_outputTree->Branch("HLT_Mu50", &_RT_HLT_Mu50 );
       _RT_outputTree->Branch("HLT_Mu45_eta2p1", &_RT_HLT_Mu45_eta2p1 );
       _RT_outputTree->Branch("HLT_Ele27_WP85_Gsf", &_RT_HLT_Ele27_WP85_Gsf );
+      _RT_outputTree->Branch("HLT_Ele105_CaloIdVT_GsfTrkIdT", &_RT_HLT_Ele105_CaloIdVT_GsfTrkIdT );
       _RT_outputTree->Branch("HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight );
       _RT_outputTree->Branch("HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight );
       _RT_outputTree->Branch("HLT_PFMETNoMu90_PFMHTNoMu90_IDTight", &_RT_HLT_PFMETNoMu90_PFMHTNoMu90_IDTight );
@@ -520,6 +723,7 @@ bool LLGAnalysis::Init() {
       _RT_outputTree->Branch("SVPVDistance_R_Uncert", &_RT_SV_MaxDistanceR_Uncert );
       _RT_outputTree->Branch("SVPVDistance_Z_Uncert", &_RT_SV_MaxDistanceZ_Uncert );
       _RT_outputTree->Branch("EventWeight", &_RT_evtWeight );
+      _RT_outputTree->Branch("LumiWeight", &_RT_lumiWeight );
       _RT_outputTree->Branch("EventNumber", &_RT_EventNumber );
       _RT_outputTree->Branch("LuminosityBlock", &_RT_LumiBlock );
       _RT_outputTree->Branch("RunNumber", &_RT_RunNumber );
@@ -527,8 +731,8 @@ bool LLGAnalysis::Init() {
 
 
     // crate eps, png and pdf in the end
-    _plotFormats.push_back(".eps");
-    _plotFormats.push_back(".png");
+    //_plotFormats.push_back(".eps");
+    //_plotFormats.push_back(".png");
     _plotFormats.push_back(".pdf");
 
     // finally set the style
@@ -539,7 +743,7 @@ bool LLGAnalysis::Init() {
 
 void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
   
-    std::cout << "RUnning event loop for selection " << SELECTION << endl;
+    std::cout << "Running event loop for selection " << SELECTION << endl;
     if( nEntriesMax < 0 ) nEntriesMax = _inputTree -> GetEntries();
     std::cout << "will process " << nEntriesMax << " events" << endl;
 
@@ -553,22 +757,39 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
     else if( SELECTION == "VertexStudy" ) SetupVertexStudy();
     else if( SELECTION == "TriggerCheck" ) SetupTriggerCheck();
     else if( SELECTION == "METTriggerEfficiencyDetermination" ) SetupMETTriggerEfficiencyDetermination();
+    else if( SELECTION == "GenHTAnalysis" ) SetupGenHTAnalysis();
+    else if( SELECTION == "RecoJetEfficiencyAnalysis" ) SetupRecoJetEfficiencyAnalysis();
+    else if( SELECTION == "ABCDMethod" ) SetupABCDMethod();
+    else if( SELECTION == "ABCDDijet" ) SetupABCDDijet();
     // SETUP YOUR SELECTION HERE
-
+   
     else {
       std::cout << "Unknown selection requested. Exiting. " << std::endl;
       return;
     }
-
     for( int i = 0; i < nEntriesMax; ++i ) {
         
         cout << "NOW RUNNING EVENT " << i << "\r"; fflush(stdout);
         //cout << "====================" << endl;
     
         _inputTree->GetEntry(i);
+        if( applyGenLevelHTCut && genLevel_HT > GENLEVEL_HT_CUT ) continue;
+
+        // handle the weights
+        evtWeight = lumiWeight;
         evtWeight *= generatorWeight;
-        RunObjectID(); 
-        FillEfficiencyHistograms();
+        pileupWeight = 1.; 
+        
+        if( applyPileupWeights ) {
+          int bin = hPU_weights->GetXaxis()->FindBin( NumberOfTrueInteractions );
+          pileupWeight = hPU_weights->GetBinContent( bin );
+        }
+        evtWeight *= pileupWeight;
+
+        if( SELECTION != "RecoJetEfficiencyAnalysis" ) {
+          RunObjectID(); 
+          //FillEfficiencyHistograms();
+        }
 
         if( SELECTION == "SignalRegion" ) SignalRegionSelection();
         else if( SELECTION == "WJetsCR" ) WJetsCRSelection();
@@ -579,12 +800,24 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         else if( SELECTION == "MuonTriggerDetermination" ) MuonTriggerDeterminationSelection();
         else if( SELECTION == "VertexStudy" ) VertexStudySelection();
         else if( SELECTION == "TriggerCheck" ) TriggerCheckSelection();
+        else if( SELECTION == "METTriggerEfficiencyDetermination" ) METTriggerEfficiencyDeterminationSelection();
+        else if( SELECTION == "GenHTAnalysis" ) GenHTAnalysisSelection();
+        else if( SELECTION == "RecoJetEfficiencyAnalysis" ) RecoJetEfficiencyAnalysisSelection();
+        else if( SELECTION == "ABCDMethod" ) ABCDMethodSelection();
         // CALL YOUR SELECTION HERE
 
-        // restore original weight:
-        evtWeight /= generatorWeight;
     }
     cout << endl;
+	passedLogFile.open("Regions.log",ios::app);
+	passedLogFile<<"*****"<<datasetName<<"*****"<<endl;
+	passedLogFile<<"RegionA: "<< RegionA<<endl;
+	passedLogFile<<"RegionB: "<< RegionB<<endl;
+	passedLogFile<<"RegionC: "<< RegionC<<endl;
+	passedLogFile<<"RegionD: "<< RegionD<<endl;
+	passedLogFile<<"RegionAWeighted: "<< RegionAWeighted<<endl;
+	passedLogFile<<"RegionBWeighted: "<< RegionBWeighted<<endl;
+	passedLogFile<<"RegionCWeighted: "<< RegionCWeighted<<endl;
+	passedLogFile<<"RegionDWeighted: "<< RegionDWeighted<<endl;
     return;
 
 }   
@@ -592,6 +825,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
 void LLGAnalysis::FillEfficiencyHistograms() {
         
     // don' fill these histograms with weights as they are used for the efficiency plots!
+    
     _histograms1D.at("MET_allEvents").Fill( met->at(SYSMET) );
     int leadingJet = -1;
     double leadingJetPt = 0.;
@@ -634,20 +868,32 @@ void LLGAnalysis::FinishRun() {
           c.SetLogx(1);
           c.SetLogy(1);
         }
+        if( (*itr_h).first == "GluinoDecVertexIsPVSV" ) {
+          c.SetLogz(1);
+        }
         for( vector<string>::iterator itr_f = _plotFormats.begin(); itr_f != _plotFormats.end(); ++itr_f ) {
             string thisPlotName = (*itr_h).first + (*itr_f);
             c.Print( thisPlotName.c_str() );
         }
         c.SetLogx(0);
         c.SetLogy(0);
+        c.SetLogz(0);
     }
     
+    /* 
     MakeEfficiencyPlot( _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1"), _histograms1D.at("MET_allEvents"), &c, "HLT_PFMET170_NoiseCleaned_v1" ); 
     MakeEfficiencyPlot( _histograms1D.at("jet1_pt_HLT_PFJet260_v1"), _histograms1D.at("jet1_pt_allEvents"), &c, "HLT_PFJet260_v1" ); 
+    */
     if( SELECTION == "MuonTriggerDetermination" ) {
       MakeEfficiencyPlot( _histograms1D.at("passedMuonsPt"), _histograms1D.at("allMuonsPt"), &c, "HLT_Mu50_v1_pt" );
       MakeEfficiencyPlot( _histograms1D.at("passedMuonsEta"), _histograms1D.at("allMuonsEta"), &c, "HLT_Mu50_v1_eta" );
       MakeEfficiencyPlot( _histograms1D.at("passedMuonsPhi"), _histograms1D.at("allMuonsPhi"), &c, "HLT_Mu50_v1_phi" );
+    }
+    if( SELECTION == "RecoJetEfficiencyAnalysis" ) {
+      MakeEfficiencyPlot( _histograms1D.at("chsMatchedQOI_pt"), _histograms1D.at("allQOI_pt"), &c, "chsMatch_pt" );
+      MakeEfficiencyPlot( _histograms1D.at("nochsMatchedQOI_pt"), _histograms1D.at("allQOI_pt"), &c, "nochsMatch_pt" );
+      MakeEfficiencyPlot( _histograms1D.at("chsMatchedQOI_drpvsv"), _histograms1D.at("allQOI_drpvsv"), &c, "chsMatch_drpvsv" );
+      MakeEfficiencyPlot( _histograms1D.at("nochsMatchedQOI_drpvsv"), _histograms1D.at("allQOI_drpvsv"), &c, "nochsMatch_drpvsv" );
     }
     
     cout << endl << "RECO CUT FLOW " << endl;
@@ -684,6 +930,10 @@ void LLGAnalysis::FinishRun() {
     */
 
     delete _inputTree;
+    delete hPU_weights;
+    delete tightJet_pt;
+    delete tightJet_eta;
+    delete tightJet_phi;
     delete recoJet_pt;
     delete recoJet_phi;
     delete recoJet_eta;
@@ -751,6 +1001,42 @@ void LLGAnalysis::FinishRun() {
 
 } 
 
+std::vector<double> LLGAnalysis::CalculatePCA( std::vector<double> *refPoint, std::vector<double> *momentum, std::vector<double> *vertex ) {
+  
+  // normalize momentum vector
+  double norm = sqrt( momentum->at(0)*momentum->at(0) + momentum->at(1)*momentum->at(1) + momentum->at(2)*momentum->at(2) );
+  double px_e = momentum->at(0)/norm;
+  double py_e = momentum->at(1)/norm;
+  double pz_e = momentum->at(2)/norm;
+
+  double or_x = refPoint->at(0);
+  double or_y = refPoint->at(1);
+  double or_z = refPoint->at(2);
+            
+  double upv_x = vertex->at(0);
+  double upv_y = vertex->at(1);
+  double upv_z = vertex->at(2);
+
+//  std::cout << "calculating pca for origin : " << or_x << " " << or_y << " " << or_z << " with momentum : " << norm*px_e << " " << norm*py_e << " " << norm*pz_e << endl;
+//  std::cout << "checking pca for " << vertex->at(0) << " " << vertex->at(1) << " " << vertex->at(2) << endl;
+
+
+  double tmin = - ( px_e*(or_x-upv_x) + py_e*(or_y-upv_y) + pz_e*(or_z-upv_z) );
+  double dx_min = upv_x - or_x - tmin*px_e;
+  double dy_min = upv_y - or_y - tmin*py_e;
+  double dz_min = upv_z - or_z - tmin*pz_e;
+
+  std::vector<double> retVec;
+  retVec.push_back( or_x + tmin*px_e );
+  retVec.push_back( or_y + tmin*py_e );
+  retVec.push_back( or_z + tmin*pz_e );
+  retVec.push_back( dx_min );
+  retVec.push_back( dy_min );
+  retVec.push_back( dz_min );
+
+  return retVec;
+
+}
 
 void LLGAnalysis::setStyle( double ytoff, bool marker, double left_margin ) {
 // use plain black on white colors

@@ -3,7 +3,6 @@
 #include <string>
 
 int main( int argc, char **argv ) {
-
     LLGAnalysis *analysis = LLGAnalysis::GetInstance( argv[1] );
     cout << "now initing" << endl;
     analysis->Init();

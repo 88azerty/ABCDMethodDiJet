@@ -1,0 +1,4 @@
+InputTree       RecoData
+Selection       ABCDMethod
+ApplyEventWeights	1
+ApplyPileupWeights	0
