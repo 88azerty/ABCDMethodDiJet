@@ -1,4 +1,4 @@
 InputTree       RecoData
-Selection       ABCDDiJet
+Selection       ABCDDijet
 ApplyEventWeights	1
 ApplyPileupWeights	0
