@@ -17,6 +17,8 @@ void LLGAnalysis::SetupABCDDijet() {
 }
 
 void LLGAnalysis::ABCDDijetSelection() {
+	int leadingPV = -1;
+	double leadingVertexPt = 0.;
 	//assign jets to vertices
 	vector<int> nJetsToPV( vertex_x->size(), 0 );
 	vector<int> nJetsToSV( secVertex_x->size(), 0 );
@@ -47,6 +49,10 @@ void LLGAnalysis::ABCDDijetSelection() {
 			fabs(position.at(2) - vertex_z->at(iVtx) ) < 1.e-10 ) {
 				nJetsToPV.at(iVtx) += 1;
 				idJetsToPV.at(iVtx).push_back( iJet );
+				if( recoJet_pt->at(iJet).at(SYSJET) > leadingVertexPt ) {
+					leadingVertexPt = recoJet_pt->at(iJet).at(SYSJET);
+					leadingPV = iVtx;
+				}
 				nMatch += 1;
 			}
 		}
@@ -78,7 +84,16 @@ void LLGAnalysis::ABCDDijetSelection() {
 	double ptFourthLeadingJet = -1;
 
 	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {
-		if ( idJetsToSV.at(iSV).size() <= 1 ) continue; //skip if vertex has fewer than 2 jets
+		if ( idJetsToSV.at(iSV).size() <= 1 ){
+			if ( leadingVertexPt<150 ) {
+				RegionA++;
+				RegionAWeighted+=evtWeight;
+			} else {
+				RegionD++;
+				RegionDWeighted+=evtWeight;
+			}
+			continue; //skip if vertex has fewer than 2 jets
+		}
 		for( unsigned int iJToSV = 0; iJToSV < idJetsToSV.at(iSV).size(); ++iJToSV ) {
 			int jIdx = idJetsToSV.at(iSV).at(iJToSV);
 			if( recoJet_pt->at(jIdx).at(SYSJET) > ptLeadingJet ) {
@@ -118,6 +133,23 @@ void LLGAnalysis::ABCDDijetSelection() {
 		TLorentzVector p4DiJet = p4Jet1 + p4Jet2;
 		_histograms1D.at("mJJSV").Fill( p4DiJet.M(), evtWeight );
 
+		if ( p4DiJet.M() <60 ) {
+			if ( leadingVertexPt <150 ) {
+				RegionA++;
+				RegionAWeighted+=evtWeight;
+			} else {
+				RegionD++;
+				RegionDWeighted+=evtWeight;
+			}
+		} else {
+			if ( leadingVertexPt<150 ) {
+				RegionB++;
+				RegionBWeighted+=evtWeight;
+			} else {
+				RegionC++;
+				RegionCWeighted+=evtWeight;
+			}
+		}
 	}
 
 	return;
