@@ -11,8 +11,8 @@ LLGAnalysis* LLGAnalysis::GetInstance( char *configFileName ) {
 }
 
 LLGAnalysis::LLGAnalysis( char *configFileName ) {
-    
-    
+
+
     // Setup the default values for the cuts:
     JET_PT_CUT_SV = 30;
     JET_PT_CUT_PV = 75;
@@ -47,14 +47,14 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         string key, value;
         configFile >> key >> ws >> value;
         if( configFile.eof() ) break;
-        if( key == "InputFile"          )   _inputFileNames.push_back( value ); 
-        if( key == "InputTree"          )   _inputTreeName = value; 
+        if( key == "InputFile"          )   _inputFileNames.push_back( value );
+        if( key == "InputTree"          )   _inputTreeName = value;
         if( key == "JET_PT_CUT_SV"      )   JET_PT_CUT_SV = atof(value.c_str());
         if( key == "JET_PT_CUT_PV"      )   JET_PT_CUT_PV = atof(value.c_str());
         if( key == "JET_ETA_CUT"        )   JET_ETA_CUT = atof(value.c_str());
-        if( key == "MUON_PT_CUT"        )   MUON_PT_CUT = atof(value.c_str()); 
-        if( key == "ELECTRON_PT_CUT"    )   ELECTRON_PT_CUT = atof(value.c_str()); 
-        if( key == "MET_CUT"            )   MET_CUT = atof(value.c_str()); 
+        if( key == "MUON_PT_CUT"        )   MUON_PT_CUT = atof(value.c_str());
+        if( key == "ELECTRON_PT_CUT"    )   ELECTRON_PT_CUT = atof(value.c_str());
+        if( key == "MET_CUT"            )   MET_CUT = atof(value.c_str());
         if( key == "TARGET_LUMI"        )   TARGET_LUMI = atof(value.c_str());
         if( key == "ApplyEventWeights"  )   applyEventWeights = ( atoi(value.c_str()) == 1 );
         if( key == "ApplyPileupWeights" )   applyPileupWeights = ( atoi(value.c_str()) == 1 );
@@ -71,7 +71,7 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         if( key == "SystUncert"         )   RUNSYS = value;
         if( key == "GENLEVEL_HT_CUT"    )   GENLEVEL_HT_CUT = atof(value.c_str());
     }
-    
+
     if( RUNSYS == "JECUP"   ) { SYSJET = 1; SYSMET = 3; }
     if( RUNSYS == "JECDOWN" ) { SYSJET = 2; SYSMET = 4; }
     if( RUNSYS == "UNCUP"   ) { SYSMET = 11; }
@@ -81,9 +81,9 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
 
     if( datasetName == "WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" ) applyGenLevelHTCut = true;
 
-    // generate the pileup reweighting histogram 
+    // generate the pileup reweighting histogram
     if( applyPileupWeights ) {
-      
+
       string mcHistogramName   = "Distribution_" + PUTYPE + "_" + datasetName;
       string dataHistogramName = "Distribution_Data_" + PUTYPE + "_" + SYSPILEUP;
       TFile *fPU = new TFile( PUFILE.c_str(), "OPEN" );
@@ -92,7 +92,7 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         exit(-1);
       }
 
-      
+
       TH1D *hdata = (TH1D*)fPU->Get(dataHistogramName.c_str());
       TH1D *hmc = (TH1D*)fPU->Get(mcHistogramName.c_str());
       if( !hdata || !hmc ) {
@@ -141,7 +141,7 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
 }
 
 void LLGAnalysis::MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, string triggerName ) {
-    
+
     TGraphAsymmErrors geff;
     geff.BayesDivide( &hpass, &htotal );
     geff.GetXaxis()->SetTitle( hpass.GetXaxis()->GetTitle() );
@@ -150,7 +150,7 @@ void LLGAnalysis::MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, strin
     string efftitle = "efficiency_" + triggerName;
     geff.SetNameTitle(efftitle.c_str(), efftitle.c_str());
     geff.SetMarkerColor(kBlue);
-    geff.Draw("APZ"); 
+    geff.Draw("APZ");
     for( vector<string>::iterator itr_f = _plotFormats.begin(); itr_f != _plotFormats.end(); ++itr_f ) {
         string thisPlotName = efftitle + (*itr_f);
         c->Print( thisPlotName.c_str() );
@@ -159,13 +159,13 @@ void LLGAnalysis::MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, strin
 }
 
 vector<double> LLGAnalysis::CalculateVertex( vector<double> x, vector<double> y, vector<double> z, vector<double> weight, vector<int> charge, vector<double> distance, unsigned int &nConsidered, double &weightednConsidered, vector<double> &error ) {
-   
+
    nConsidered = 0;
    vector<double> diff_x;
    vector<double> diff_y;
    vector<double> diff_z;
    vector<double> score;
-   
+
    for( unsigned int i = 0; i < x.size(); ++i ) {
       if( charge.at(i) == 0 ) continue;
       nConsidered += 1;
@@ -177,7 +177,7 @@ vector<double> LLGAnalysis::CalculateVertex( vector<double> x, vector<double> y,
             iKnown = i2;
         }
       }
-    
+
       if( knownPoint ) {
         score.at(iKnown) += weight.at(i)/distance.at(i);
       }
@@ -188,7 +188,7 @@ vector<double> LLGAnalysis::CalculateVertex( vector<double> x, vector<double> y,
         score.push_back( weight.at(i)/distance.at(i) );
       }
    }
-    
+
    double scoreMax = 0.;
    vector<double> mean(3, -10000.);
    for( unsigned int i = 0; i < diff_x.size(); ++i ) {
@@ -228,16 +228,16 @@ void LLGAnalysis::makeHist( string nametitle, int nbins, double xmin, double xma
 }
 
 bool LLGAnalysis::Init() {
-   
+
 
     gROOT->ProcessLine(".L Loader.C+");
     gROOT->ProcessLine("#include <vector>");
     gSystem->Load("Loader_C.so");
     setStyle(1.0,true,0.15);
-   
+
     _inputTree = new TChain(_inputTreeName.c_str());
     for( vector<string>::iterator itr = _inputFileNames.begin(); itr != _inputFileNames.end(); ++itr ) {
-        _inputTree -> Add( (*itr).c_str() );  
+        _inputTree -> Add( (*itr).c_str() );
     }
 
     // create the histograms and add them to the list
@@ -284,7 +284,7 @@ bool LLGAnalysis::Init() {
     recoCHSJet_const_closestVertex_dxy = new std::vector<std::vector<double> >;
     recoCHSJet_const_closestVertex_dz = new std::vector<std::vector<double> >;
     recoCHSJet_const_closestVertex_d = new std::vector<std::vector<double> >;
-   
+
     recoNoCHSJet_pt = new std::vector<double>;
     recoNoCHSJet_eta = new std::vector<double>;
     recoNoCHSJet_phi = new std::vector<double>;
@@ -305,8 +305,8 @@ bool LLGAnalysis::Init() {
     recoNoCHSJet_const_closestVertex_dxy = new std::vector<std::vector<double> >;
     recoNoCHSJet_const_closestVertex_dz = new std::vector<std::vector<double> >;
     recoNoCHSJet_const_closestVertex_d = new std::vector<std::vector<double> >;
-      
-    signalJets_pt = new std::vector<double>; 
+
+    signalJets_pt = new std::vector<double>;
     signalJets_eta = new std::vector<double>;
     signalJets_phi = new std::vector<double>;
     signalJets_constVertex_x = new std::vector<std::vector<double> >;
@@ -335,7 +335,7 @@ bool LLGAnalysis::Init() {
     muon_iso = new vector<double>;
     muon_isTightMuon = new vector<bool>;
     muon_isLooseMuon = new vector<bool>;
-    
+
     electron_px = new vector<double>;
     electron_py = new vector<double>;
     electron_pz = new vector<double>;
@@ -360,7 +360,7 @@ bool LLGAnalysis::Init() {
 
     triggerBits = new vector<int>;
     triggerNames = new vector<string>;
-    /* 
+    /*
     recoJet_constVertex_x = new vector<vector<double> >;
     recoJet_constVertex_y = new vector<vector<double> >;
     recoJet_constVertex_z = new vector<vector<double> >;
@@ -389,7 +389,7 @@ bool LLGAnalysis::Init() {
     secVertex_pt = new vector<double>;
     secVertex_chi2 = new vector<double>;
     secVertex_ndof = new vector<double>;
- 
+
     met = new vector<double>;
     met_x = new vector<double>;
     met_y = new vector<double>;
@@ -517,7 +517,7 @@ bool LLGAnalysis::Init() {
 //    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_dz", &recoCHSJet_const_closestVertex_dz );
 //    _inputTree->SetBranchAddress("RecoCHSJet_const_closestVertex_d", &recoCHSJet_const_closestVertex_d );
 //    _inputTree->SetBranchAddress("RecoCHSJet_const_eta", &recoCHSJet_const_eta );
-//    _inputTree->SetBranchAddress("RecoCHSJet_const_phi", &recoCHSJet_const_phi ); 
+//    _inputTree->SetBranchAddress("RecoCHSJet_const_phi", &recoCHSJet_const_phi );
 
 //    _inputTree->SetBranchAddress("RecoNoCHSJet_pt", &recoNoCHSJet_pt );
 //    _inputTree->SetBranchAddress("RecoNoCHSJet_eta", &recoNoCHSJet_eta );
@@ -538,7 +538,7 @@ bool LLGAnalysis::Init() {
 //    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_dz", &recoNoCHSJet_const_closestVertex_dz );
 //    _inputTree->SetBranchAddress("RecoNoCHSJet_const_closestVertex_d", &recoNoCHSJet_const_closestVertex_d );
 //    _inputTree->SetBranchAddress("RecoNoCHSJet_const_eta", &recoNoCHSJet_const_eta );
-//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_phi", &recoNoCHSJet_const_phi ); 
+//    _inputTree->SetBranchAddress("RecoNoCHSJet_const_phi", &recoNoCHSJet_const_phi );
     if( requireGenBranches ) {
       std::cout << "setting mct branch addresses" << std::endl;
       _inputTree->SetBranchAddress("GenLevel_px", &mct_px );
@@ -666,7 +666,7 @@ bool LLGAnalysis::Init() {
       _outputTree->Branch("GluinoDecayVertex_z", &gluinoDecVertex_z );
     }
     // ROOT Trees:
-    if( SELECTION == "MakeROOTTrees" && _inputTree->GetEntries() > 0 ) { 
+    if( SELECTION == "MakeROOTTrees" && _inputTree->GetEntries() > 0 ) {
       //_inputTree->GetEntry(0);
       //for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
       //  _RT_outputTree->Branch( triggerNames->at(iTrig).c_str(), &triggerBits->at(iTrig) );
@@ -742,7 +742,7 @@ bool LLGAnalysis::Init() {
 }
 
 void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
-  
+
     std::cout << "Running event loop for selection " << SELECTION << endl;
     if( nEntriesMax < 0 ) nEntriesMax = _inputTree -> GetEntries();
     std::cout << "will process " << nEntriesMax << " events" << endl;
@@ -762,24 +762,24 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
     else if( SELECTION == "ABCDMethod" ) SetupABCDMethod();
     else if( SELECTION == "ABCDDijet" ) SetupABCDDijet();
     // SETUP YOUR SELECTION HERE
-   
+
     else {
       std::cout << "Unknown selection requested. Exiting. " << std::endl;
       return;
     }
     for( int i = 0; i < nEntriesMax; ++i ) {
-        
+
         cout << "NOW RUNNING EVENT " << i << "\r"; fflush(stdout);
         //cout << "====================" << endl;
-    
+
         _inputTree->GetEntry(i);
         if( applyGenLevelHTCut && genLevel_HT > GENLEVEL_HT_CUT ) continue;
 
         // handle the weights
         evtWeight = lumiWeight;
         evtWeight *= generatorWeight;
-        pileupWeight = 1.; 
-        
+        pileupWeight = 1.;
+
         if( applyPileupWeights ) {
           int bin = hPU_weights->GetXaxis()->FindBin( NumberOfTrueInteractions );
           pileupWeight = hPU_weights->GetBinContent( bin );
@@ -787,7 +787,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         evtWeight *= pileupWeight;
 
         if( SELECTION != "RecoJetEfficiencyAnalysis" ) {
-          RunObjectID(); 
+          RunObjectID();
           //FillEfficiencyHistograms();
         }
 
@@ -808,25 +808,17 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
         // CALL YOUR SELECTION HERE
 
     }
-    cout << endl;
-	passedLogFile.open("Regions.log",ios::app);
-	passedLogFile<<"*****"<<datasetName<<"*****"<<endl;
-	passedLogFile<<"RegionA: "<< RegionA<<endl;
-	passedLogFile<<"RegionB: "<< RegionB<<endl;
-	passedLogFile<<"RegionC: "<< RegionC<<endl;
-	passedLogFile<<"RegionD: "<< RegionD<<endl;
-	passedLogFile<<"RegionAWeighted: "<< RegionAWeighted<<endl;
-	passedLogFile<<"RegionBWeighted: "<< RegionBWeighted<<endl;
-	passedLogFile<<"RegionCWeighted: "<< RegionCWeighted<<endl;
-	passedLogFile<<"RegionDWeighted: "<< RegionDWeighted<<endl;
-    return;
 
-}   
+	passedLogFile.open("Regions.log",ios::app);
+	passedLogFile<<datasetName<<"    "<<RegionA<<"    "<<RegionB<<"    "<<RegionC<<"    "<<RegionD<<"    "<<RegionAWeighted<<"    "<<RegionBWeighted<<"    "<<RegionCWeighted<<"    "<<RegionDWeighted<<endl;
+
+  return;
+}
 
 void LLGAnalysis::FillEfficiencyHistograms() {
-        
+
     // don' fill these histograms with weights as they are used for the efficiency plots!
-    
+
     _histograms1D.at("MET_allEvents").Fill( met->at(SYSMET) );
     int leadingJet = -1;
     double leadingJetPt = 0.;
@@ -841,7 +833,7 @@ void LLGAnalysis::FillEfficiencyHistograms() {
 
 
     for( unsigned int iTrig = 0; iTrig < triggerNames->size(); ++iTrig ) {
-            
+
         // don' fill these histograms with weights as they are used for the efficiency plots!
         if( triggerNames->at(iTrig) == "HLT_PFMET170_NoiseCleaned_v1" && triggerBits->at(iTrig) == 1 ) {
             _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1").Fill( met->at(SYSMET) );
@@ -862,7 +854,7 @@ void LLGAnalysis::FinishRun() {
             c.Print( thisPlotName.c_str() );
         }
     }
-    
+
     for( map<string,TH2D>::iterator itr_h = _histograms2D.begin(); itr_h != _histograms2D.end(); ++itr_h ) {
         (*itr_h).second.Draw( (_histograms2DDrawOptions.at((*itr_h).first)).c_str()  );
         if( (*itr_h).first.find( "SV2Jets") != string::npos && (*itr_h).first.find("VertexScore") != string::npos ) {
@@ -880,10 +872,10 @@ void LLGAnalysis::FinishRun() {
         c.SetLogy(0);
         c.SetLogz(0);
     }
-    
-    /* 
-    MakeEfficiencyPlot( _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1"), _histograms1D.at("MET_allEvents"), &c, "HLT_PFMET170_NoiseCleaned_v1" ); 
-    MakeEfficiencyPlot( _histograms1D.at("jet1_pt_HLT_PFJet260_v1"), _histograms1D.at("jet1_pt_allEvents"), &c, "HLT_PFJet260_v1" ); 
+
+    /*
+    MakeEfficiencyPlot( _histograms1D.at("MET_HLT_PFMET170_NoiseCleaned_v1"), _histograms1D.at("MET_allEvents"), &c, "HLT_PFMET170_NoiseCleaned_v1" );
+    MakeEfficiencyPlot( _histograms1D.at("jet1_pt_HLT_PFJet260_v1"), _histograms1D.at("jet1_pt_allEvents"), &c, "HLT_PFJet260_v1" );
     */
     if( SELECTION == "MuonTriggerDetermination" ) {
       MakeEfficiencyPlot( _histograms1D.at("passedMuonsPt"), _histograms1D.at("allMuonsPt"), &c, "HLT_Mu50_v1_pt" );
@@ -896,7 +888,7 @@ void LLGAnalysis::FinishRun() {
       MakeEfficiencyPlot( _histograms1D.at("chsMatchedQOI_drpvsv"), _histograms1D.at("allQOI_drpvsv"), &c, "chsMatch_drpvsv" );
       MakeEfficiencyPlot( _histograms1D.at("nochsMatchedQOI_drpvsv"), _histograms1D.at("allQOI_drpvsv"), &c, "nochsMatch_drpvsv" );
     }
-    
+
     cout << endl << "RECO CUT FLOW " << endl;
     cout << "-----------------------------" << endl;
     for( map<string,int>::iterator itr = _cutFlow.begin(); itr != _cutFlow.end(); ++itr ) {
@@ -920,7 +912,7 @@ void LLGAnalysis::FinishRun() {
       _RT_outputTree->Write();
       _RT_outputFile->Close();
     }
-    /* 
+    /*
     cout << "PRINTING 2D OPTIMISATION MATRIX : " << endl;
     for( unsigned int i = 0; i < _yields2DOptimisation.size(); ++i ) {
       for( unsigned int j = 0; j < _yields2DOptimisation.at(i).size(); ++j ) {
@@ -1000,10 +992,10 @@ void LLGAnalysis::FinishRun() {
     delete secVertex_ndof;
     delete secVertex_pt;
 
-} 
+}
 
 std::vector<double> LLGAnalysis::CalculatePCA( std::vector<double> *refPoint, std::vector<double> *momentum, std::vector<double> *vertex ) {
-  
+
   // normalize momentum vector
   double norm = sqrt( momentum->at(0)*momentum->at(0) + momentum->at(1)*momentum->at(1) + momentum->at(2)*momentum->at(2) );
   double px_e = momentum->at(0)/norm;
@@ -1013,7 +1005,7 @@ std::vector<double> LLGAnalysis::CalculatePCA( std::vector<double> *refPoint, st
   double or_x = refPoint->at(0);
   double or_y = refPoint->at(1);
   double or_z = refPoint->at(2);
-            
+
   double upv_x = vertex->at(0);
   double upv_y = vertex->at(1);
   double upv_z = vertex->at(2);
