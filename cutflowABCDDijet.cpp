@@ -77,8 +77,9 @@ void LLGAnalysis::ABCDDijetSelection() {
 	int idxFourthLeadingJet = -1;
 	double ptFourthLeadingJet = -1;
 
-	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {cout<<"Firstfor";
-		for( unsigned int iJToSV = 0; iJToSV < idJetsToSV.at(iSV).size(); ++iJToSV ) {cout<<"Secondfor";
+	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {
+		if ( idJetsToSV.at(iSV).size() =<1 ) continue; //skip if vertex has fewer than 2 jets
+		for( unsigned int iJToSV = 0; iJToSV < idJetsToSV.at(iSV).size(); ++iJToSV ) {
 			int jIdx = idJetsToSV.at(iSV).at(iJToSV);
 			if( recoJet_pt->at(jIdx).at(SYSJET) > ptLeadingJet ) {
 				idxFourthLeadingJet = idxThirdLeadingJet;
