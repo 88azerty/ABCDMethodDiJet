@@ -77,6 +77,7 @@ void LLGAnalysis::ABCDDijetSelection() {
 	int idxFourthLeadingJet = -1;
 	double ptFourthLeadingJet = -1;
 
+<<<<<<< HEAD
 	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {
 		for( unsigned int iJToSV = 0; iJToSV < idJetsToSV.at(iSV).size(); ++iJToSV ) {
 			int jIdx = idJetsToSV.at(iSV).at(iJToSV);
@@ -117,8 +118,46 @@ void LLGAnalysis::ABCDDijetSelection() {
 		TLorentzVector p4DiJet = p4Jet1 + p4Jet2;
 		_histograms1D.at("mJJSV").Fill( p4DiJet.M(), evtWeight );
 
+=======
+	for( unsigned int iJToSV = 0; iJToSV < idJetsToSV.at(iSV).size(); ++iJToSV ) {
+		int jIdx = idJetsToSV.at(iSV).at(iJToSV);
+		if( recoJet_pt->at(jIdx).at(SYSJET) > ptLeadingJet ) {
+			idxFourthLeadingJet = idxThirdLeadingJet;
+			ptFourthLeadingJet = ptThirdLeadingJet;
+			idxThirdLeadingJet = idxSubLeadingJet;
+			ptThirdLeadingJet = ptSubLeadingJet;
+			idxSubLeadingJet = idxLeadingJet;
+			ptSubLeadingJet = ptLeadingJet;
+			idxLeadingJet = jIdx;
+			ptLeadingJet = recoJet_pt->at(jIdx).at(SYSJET);
+		}
+		else if ( recoJet_pt->at(jIdx).at(SYSJET) > ptSubLeadingJet ) {
+			idxFourthLeadingJet = idxThirdLeadingJet;
+			ptFourthLeadingJet = ptThirdLeadingJet;
+			idxThirdLeadingJet = idxSubLeadingJet;
+			ptThirdLeadingJet = ptSubLeadingJet;
+			idxSubLeadingJet = jIdx;
+			ptSubLeadingJet = recoJet_pt->at(jIdx).at(SYSJET);
+		}
+		else if ( recoJet_pt->at(jIdx).at(SYSJET) > ptThirdLeadingJet ) {
+			idxFourthLeadingJet = idxThirdLeadingJet;
+			ptFourthLeadingJet = ptThirdLeadingJet;
+			idxThirdLeadingJet = jIdx;
+			ptThirdLeadingJet = recoJet_pt->at(jIdx).at(SYSJET);
+		}
+		else if ( recoJet_pt->at(jIdx).at(SYSJET) > ptFourthLeadingJet ) {
+			idxFourthLeadingJet = jIdx;
+			ptFourthLeadingJet = recoJet_pt->at(jIdx).at(SYSJET);
+		}
+>>>>>>> ed34eaff7583b84ce4dabb354fa4c248b0c8109a
 	}
 
+	//Calculate DiJet Mass
+	TLorentzVector p4Jet1, p4Jet2;
+	p4Jet1.SetPtEtaPhiM( recoJet_pt->at(idxLeadingJet).at(SYSJET), recoJet_eta->at(idxLeadingJet), recoJet_phi->at(idxLeadingJet), 0. );
+	p4Jet2.SetPtEtaPhiM( recoJet_pt->at(idxSubLeadingJet).at(SYSJET), recoJet_eta->at(idxSubLeadingJet), recoJet_phi->at(idxSubLeadingJet), 0. );
+	TLorentzVector p4DiJet = p4Jet1 + p4Jet2;
+	_histograms1D.at("mJJSV").Fill( p4DiJet.M(), evtWeight );
 	return;
 
 }
