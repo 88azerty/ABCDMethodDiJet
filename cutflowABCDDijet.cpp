@@ -84,6 +84,9 @@ void LLGAnalysis::ABCDDijetSelection() {
 	double ptFourthLeadingJet = -1;
 
 	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {
+		if ( met->at(SYSMET) < 210 ) {
+			continue; //skip if MET smaller than 210 (MET cut)
+		}
 		if ( idJetsToSV.at(iSV).size() <= 1 ){
 			if ( leadingVertexPt<150 ) {
 				RegionA++;
