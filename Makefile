@@ -1,7 +1,7 @@
 ROOTGLIBS =`root-config --glibs` -lMinuit
 LIBS = `root-config --glibs` -L/usr/X11R6/lib -lm -ldl -lstdc++ -Wl,--no-as-needed $(ROOTGLIBS)
 
-CXXFLAGS = -O3 -Wall --exceptions `root-config --ldflags --cflags` -I./
+CXXFLAGS = -O3 --exceptions `root-config --ldflags --cflags` -I./ -w
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
