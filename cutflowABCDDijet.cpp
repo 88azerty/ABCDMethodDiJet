@@ -2,6 +2,8 @@
 #include "TLorentzVector.h"
 void LLGAnalysis::SetupABCDDijet() {
 
+	_cutFlow.insert(pair<string,int>("0_NoCut", 0 ) );
+	_cutFlow.insert(pair<string,int>("1_MET", 0 ) );
 	RegionA=0;
 	RegionAWeighted=0;
 	RegionB=0;
@@ -17,6 +19,11 @@ void LLGAnalysis::SetupABCDDijet() {
 }
 
 void LLGAnalysis::ABCDDijetSelection() {
+	_cutFlow.at("0_NoCut") += 1;
+	if (sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET)) > MET_CUT ) {
+		return;
+	}
+	_cutFlow.at("1_MET") += 1;
 	int leadingPV = -1;
 	double leadingVertexPt = 0.;
 	//assign jets to vertices
@@ -84,9 +91,6 @@ void LLGAnalysis::ABCDDijetSelection() {
 	double ptFourthLeadingJet = -1;
 
 	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {
-		if ( met->at(SYSMET) < 210 ) {
-			continue; //skip if MET smaller than 210 (MET cut)
-		}
 		if ( idJetsToSV.at(iSV).size() <= 1 ){
 			if ( leadingVertexPt<150 ) {
 				RegionA++;
