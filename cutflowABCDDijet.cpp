@@ -149,21 +149,21 @@ void LLGAnalysis::ABCDDijetSelection() {
 			if ( leadingVertexPt <150 ) {
 				RegionA++;
 				RegionAWeighted+=evtWeight;
-				RegionAError+=pow(evtWeight,2.0);
+				RegionAError+=pow(evtWeight,2);
 			} else {
 				RegionD++;
 				RegionDWeighted+=evtWeight;
-				RegionDError+=pow(evtWeight,2.0);
+				RegionDError+=pow(evtWeight,2);
 			}
 		} else {
 			if ( leadingVertexPt<150 ) {
 				RegionB++;
 				RegionBWeighted+=evtWeight;
-				RegionBError+=pow(evtWeight,2.0);
+				RegionBError+=pow(evtWeight,2);
 			} else {
 				RegionC++;
 				RegionCWeighted+=evtWeight;
-				RegionCError+=pow(evtWeight,2.0);
+				RegionCError+=pow(evtWeight,2);
 			}
 		}
 	}
