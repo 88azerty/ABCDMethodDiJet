@@ -1,6 +1,5 @@
 #include "LLGAnalysis.h"
 #include "TLorentzVector.h"
-#include <cmath>
 void LLGAnalysis::SetupABCDDijet() {
 
 	_cutFlow.insert(pair<string,int>("0_NoCut", 0 ) );
@@ -149,21 +148,21 @@ void LLGAnalysis::ABCDDijetSelection() {
 			if ( leadingVertexPt <150 ) {
 				RegionA++;
 				RegionAWeighted+=evtWeight;
-				RegionAError+=pow(evtWeight,2);
+				RegionAError+=evtWeight*evtWeight;
 			} else {
 				RegionD++;
 				RegionDWeighted+=evtWeight;
-				RegionDError+=pow(evtWeight,2);
+				RegionDError+=evtWeight*evtWeight;
 			}
 		} else {
 			if ( leadingVertexPt<150 ) {
 				RegionB++;
 				RegionBWeighted+=evtWeight;
-				RegionBError+=pow(evtWeight,2);
+				RegionBError+=evtWeight*evtWeight;
 			} else {
 				RegionC++;
 				RegionCWeighted+=evtWeight;
-				RegionCError+=pow(evtWeight,2);
+				RegionCError+=evtWeight*evtWeight;
 			}
 		}
 	}
