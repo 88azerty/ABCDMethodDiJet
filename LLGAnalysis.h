@@ -26,21 +26,21 @@ class LLGAnalysis {
     public:
         static LLGAnalysis* GetInstance( char* configFileName );
         ~LLGAnalysis() {}
-        
-        vector<double> CalculateVertex( vector<double> x, vector<double> y, vector<double> z, vector<double> weight, vector<int> charge, vector<double> distance, unsigned int &nConsidered, double &weightednConsidered, vector<double> &error ); 
-        
+
+        vector<double> CalculateVertex( vector<double> x, vector<double> y, vector<double> z, vector<double> weight, vector<int> charge, vector<double> distance, unsigned int &nConsidered, double &weightednConsidered, vector<double> &error );
+
         bool Init();
         void RunEventLoop( int nEventsMax = -1);
         void FinishRun();
-    
+
     private:
         static LLGAnalysis* _instance;
 
         void RunObjectID();
 
-        void makeHist( string nametitle, int nbinsx, double xmin, double xmax, int nbinsy, double ymin, double ymax, string xtitle, string ytitle, string ztitle, string drawOption = "", double xAxisOffset = 1., double yAxisOffset = 1.2, double zAxisOffset = 1. ); 
+        void makeHist( string nametitle, int nbinsx, double xmin, double xmax, int nbinsy, double ymin, double ymax, string xtitle, string ytitle, string ztitle, string drawOption = "", double xAxisOffset = 1., double yAxisOffset = 1.2, double zAxisOffset = 1. );
         void makeHist( string nametitle, int nbins, double xmin, double xmax, string xtitle, string ytitle, string drawOption = "", double xAxisOffset = 1., double yAxisOffset = 1.2 );
-        void setStyle(double ytoff = 1.0, bool marker = true, double left_margin = 0.15); 
+        void setStyle(double ytoff = 1.0, bool marker = true, double left_margin = 0.15);
         void MakeEfficiencyPlot( TH1D hpass, TH1D htotal, TCanvas *c, string triggerName = "");
         void FillEfficiencyHistograms();
 
@@ -80,7 +80,7 @@ class LLGAnalysis {
     private:
         LLGAnalysis() {}
         LLGAnalysis( char* configFileName );
-        
+
         map<string, int>        _cutFlow;
         map<string, TH1D>       _histograms1D;
         map<string, TH2D>       _histograms2D;
@@ -104,9 +104,9 @@ class LLGAnalysis {
         vector<double> *recoNoCHSJet_pt;
         vector<double> *recoNoCHSJet_eta;
         vector<double> *recoNoCHSJet_phi;
-        vector<vector<double> > *recoJet_pt; 
-        vector<double> *recoJet_phi; 
-        vector<double> *recoJet_eta; 
+        vector<vector<double> > *recoJet_pt;
+        vector<double> *recoJet_phi;
+        vector<double> *recoJet_eta;
         vector<double> *recoJet_btag_combinedInclusiveSecondaryVertexV2BJetTags;
         vector<double> *recoJet_btag_jetBProbabilityBJetTags;
         vector<double> *recoJet_btag_jetProbabilityBJetTags;
@@ -119,121 +119,121 @@ class LLGAnalysis {
         vector<int> *recoJet_nConsidered;
         vector<double> *recoJet_averageDistance;;
         vector<double> *recoJet_rmsDistance;
-        vector<double> *muon_px; 
-        vector<double> *muon_py; 
-        vector<double> *muon_pz; 
-        vector<double> *muon_phi; 
-        vector<double> *muon_eta; 
+        vector<double> *muon_px;
+        vector<double> *muon_py;
+        vector<double> *muon_pz;
+        vector<double> *muon_phi;
+        vector<double> *muon_eta;
         vector<double> *muon_iso;
         vector<bool>   *muon_isLooseMuon;
         vector<bool>   *muon_isTightMuon;
-        vector<double> *electron_px; 
-        vector<double> *electron_py; 
-        vector<double> *electron_pz; 
-        vector<double> *electron_phi; 
-        vector<double> *electron_eta; 
+        vector<double> *electron_px;
+        vector<double> *electron_py;
+        vector<double> *electron_pz;
+        vector<double> *electron_phi;
+        vector<double> *electron_eta;
         vector<double> *electron_iso;
         vector<bool> *electron_isVeto;
         vector<bool> *electron_isLoose;
         vector<bool> *electron_isMedium;
         vector<bool> *electron_isTight;
         vector<bool> *electron_isHEEP;
-        vector<int> *triggerBits; 
-        vector<string> *triggerNames; 
+        vector<int> *triggerBits;
+        vector<string> *triggerNames;
         /*
-        vector<vector<double> > *recoJet_constVertex_x; 
-        vector<vector<double> > *recoJet_constVertex_y; 
-        vector<vector<double> > *recoJet_constVertex_z; 
-        vector<vector<double> > *recoJet_const_pt; 
-        vector<vector<double> > *recoJet_const_closestVertex_dxy; 
-        vector<vector<double> > *recoJet_const_closestVertex_dz; 
+        vector<vector<double> > *recoJet_constVertex_x;
+        vector<vector<double> > *recoJet_constVertex_y;
+        vector<vector<double> > *recoJet_constVertex_z;
+        vector<vector<double> > *recoJet_const_pt;
+        vector<vector<double> > *recoJet_const_closestVertex_dxy;
+        vector<vector<double> > *recoJet_const_closestVertex_dz;
         vector<vector<double> > *recoJet_const_closestVertex_d;
-        vector<vector<int> > *recoJet_const_charge; 
+        vector<vector<int> > *recoJet_const_charge;
         */
-        std::vector<std::vector<double> >* recoCHSJet_constVertex_x; 
-        std::vector<std::vector<double> >* recoCHSJet_constVertex_y; 
-        std::vector<std::vector<double> >* recoCHSJet_constVertex_z; 
-        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_x; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_x;
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_y;
+        std::vector<std::vector<double> >* recoCHSJet_constVertex_z;
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_x;
         std::vector<std::vector<double> >* recoCHSJet_constVertexRef_y;
-        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_z; 
-        std::vector<std::vector<double> >* recoCHSJet_const_pt;     
-        std::vector<std::vector<double> >* recoCHSJet_const_eta;     
-        std::vector<std::vector<double> >* recoCHSJet_const_phi;     
-        std::vector<std::vector<int> >*    recoCHSJet_const_charge;  
-        std::vector<std::vector<int> >*    recoCHSJet_const_fromPV;  
-        std::vector<std::vector<double> >* recoCHSJet_const_pca0_x; 
-        std::vector<std::vector<double> >* recoCHSJet_const_pca0_y; 
-        std::vector<std::vector<double> >* recoCHSJet_const_pca0_z; 
-        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dxy; 
-        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dz; 
-        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_d; 
-        
-        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_x; 
-        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_y; 
-        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_z; 
-        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_x; 
-        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_y; 
+        std::vector<std::vector<double> >* recoCHSJet_constVertexRef_z;
+        std::vector<std::vector<double> >* recoCHSJet_const_pt;
+        std::vector<std::vector<double> >* recoCHSJet_const_eta;
+        std::vector<std::vector<double> >* recoCHSJet_const_phi;
+        std::vector<std::vector<int> >*    recoCHSJet_const_charge;
+        std::vector<std::vector<int> >*    recoCHSJet_const_fromPV;
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_x;
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_y;
+        std::vector<std::vector<double> >* recoCHSJet_const_pca0_z;
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dxy;
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_dz;
+        std::vector<std::vector<double> >* recoCHSJet_const_closestVertex_d;
+
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_x;
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_y;
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertex_z;
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_x;
+        std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_y;
         std::vector<std::vector<double> >* recoNoCHSJet_constVertexRef_z;
-        std::vector<std::vector<double> >* recoNoCHSJet_const_pt;      
-        std::vector<std::vector<double> >* recoNoCHSJet_const_eta;     
-        std::vector<std::vector<double> >* recoNoCHSJet_const_phi;     
-        std::vector<std::vector<int> >*    recoNoCHSJet_const_charge;  
-        std::vector<std::vector<int> >*    recoNoCHSJet_const_fromPV;  
-        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_x; 
-        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_y; 
-        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_z; 
-        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dxy; 
-        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dz; 
-        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_d; 
-   
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pt;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_eta;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_phi;
+        std::vector<std::vector<int> >*    recoNoCHSJet_const_charge;
+        std::vector<std::vector<int> >*    recoNoCHSJet_const_fromPV;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_x;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_y;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_pca0_z;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dxy;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_dz;
+        std::vector<std::vector<double> >* recoNoCHSJet_const_closestVertex_d;
+
         std::vector<double>* tightJet_pt;
         std::vector<double>* tightJet_eta;
         std::vector<double>* tightJet_phi;
 
         std::vector<double>* signalJets_pt;
-        std::vector<double>* signalJets_eta; 
-        std::vector<double>* signalJets_phi; 
-        std::vector<std::vector<double> >* signalJets_constVertex_x; 
-        std::vector<std::vector<double> >* signalJets_constVertex_y; 
-        std::vector<std::vector<double> >* signalJets_constVertex_z; 
-        std::vector<std::vector<double> >* signalJets_constVertexRef_x; 
-        std::vector<std::vector<double> >* signalJets_constVertexRef_y; 
-        std::vector<std::vector<double> >* signalJets_constVertexRef_z; 
-        std::vector<std::vector<double> >* signalJets_const_pt; 
+        std::vector<double>* signalJets_eta;
+        std::vector<double>* signalJets_phi;
+        std::vector<std::vector<double> >* signalJets_constVertex_x;
+        std::vector<std::vector<double> >* signalJets_constVertex_y;
+        std::vector<std::vector<double> >* signalJets_constVertex_z;
+        std::vector<std::vector<double> >* signalJets_constVertexRef_x;
+        std::vector<std::vector<double> >* signalJets_constVertexRef_y;
+        std::vector<std::vector<double> >* signalJets_constVertexRef_z;
+        std::vector<std::vector<double> >* signalJets_const_pt;
         std::vector<std::vector<int> >* signalJets_const_charge;
-        std::vector<std::vector<int> >* signalJets_const_fromPV; 
-        std::vector<std::vector<double> >* signalJets_const_pca0_x; 
+        std::vector<std::vector<int> >* signalJets_const_fromPV;
+        std::vector<std::vector<double> >* signalJets_const_pca0_x;
         std::vector<std::vector<double> >* signalJets_const_pca0_y;
-        std::vector<std::vector<double> >* signalJets_const_pca0_z; 
+        std::vector<std::vector<double> >* signalJets_const_pca0_z;
         std::vector<std::vector<double> >* signalJets_const_eta;
-        std::vector<std::vector<double> >* signalJets_const_phi; 
-        double gluinoProdVertex_x, gluinoProdVertex_y, gluinoProdVertex_z; 
+        std::vector<std::vector<double> >* signalJets_const_phi;
+        double gluinoProdVertex_x, gluinoProdVertex_y, gluinoProdVertex_z;
         std::vector<double> *gluinoDecVertex_x;
         std::vector<double> *gluinoDecVertex_y;
         std::vector<double> *gluinoDecVertex_z;
- 
+
         vector<bool> *recoJet_isLeptonLike;
 
         vector<double> *vertex_x;
         vector<double> *vertex_y;
-        vector<double> *vertex_z; 
-        vector<double> *vertex_nTracks; 
-        vector<double> *vertex_pt; 
+        vector<double> *vertex_z;
+        vector<double> *vertex_nTracks;
+        vector<double> *vertex_pt;
         vector<double> *vertex_ndof;
         vector<double> *vertex_dx;
         vector<double> *vertex_dy;
         vector<double> *vertex_dz;
 
         vector<double> *secVertex_x;
-        vector<double> *secVertex_y; 
+        vector<double> *secVertex_y;
         vector<double> *secVertex_z;
         vector<double> *secVertex_ndof;
         vector<double> *secVertex_chi2;
         vector<double> *secVertex_pt;
         vector<double> *secVertex_dx;
-        vector<double> *secVertex_dy; 
-        vector<double> *secVertex_dz; 
-         
+        vector<double> *secVertex_dy;
+        vector<double> *secVertex_dz;
+
         vector<string> *to_TriggerNames;
         vector<vector<double> > *to_pt;
         vector<vector<double> > *to_eta;
@@ -253,7 +253,7 @@ class LLGAnalysis {
         vector<vector<double> > *mct_parentPz;
         vector<vector<double> > *mct_parentE;
 
-        
+
         vector<int> vetoElectrons;
         vector<int> looseElectrons;
         vector<int> mediumElectrons;
@@ -280,20 +280,20 @@ class LLGAnalysis {
         string GenFileName;
 
 
-        TFile *fTruth; 
+        TFile *fTruth;
         TTree *tTruth;
         int GenRunNumber, GenEventNumber, GenLumiBlock;
-        vector<double> *tmct_px; 
-        vector<double> *tmct_py; 
-        vector<double> *tmct_pz; 
-        vector<double> *tmct_vx; 
-        vector<double> *tmct_vy; 
-        vector<double> *tmct_vz; 
-        vector<double> *tmct_e; 
-        vector<int> *tmct_id; 
-        vector<int> *tmct_status; 
-        vector<int> *tmct_parent; 
-        vector<vector<int> > *tmct_daughters; 
+        vector<double> *tmct_px;
+        vector<double> *tmct_py;
+        vector<double> *tmct_pz;
+        vector<double> *tmct_vx;
+        vector<double> *tmct_vy;
+        vector<double> *tmct_vz;
+        vector<double> *tmct_e;
+        vector<int> *tmct_id;
+        vector<int> *tmct_status;
+        vector<int> *tmct_parent;
+        vector<vector<int> > *tmct_daughters;
         int lastTruthEntry;
 
 
@@ -368,12 +368,16 @@ class LLGAnalysis {
 
 	long int RegionA;
 	long double RegionAWeighted;
+  long double RegionAError;
 	long int RegionB;
 	long double RegionBWeighted;
+  long double RegionBError;
 	long int RegionC;
 	long double RegionCWeighted;
+  long double RegionCError;
 	long int RegionD;
 	long double RegionDWeighted;
+  long double RegionDError;
 
         double evtWeight;
         double JET_PT_CUT_SV;
@@ -398,14 +402,13 @@ class LLGAnalysis {
 
         bool applyEventWeights;
         bool applyPileupWeights;
-        
+
 
         //for pileup reweighting
         std::string PUFILE;
         TH1D *hPU_weights;
 
-        bool requireGenBranches; 
+        bool requireGenBranches;
         vector<string> _plotFormats;
 
 };
-

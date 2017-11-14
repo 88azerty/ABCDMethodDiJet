@@ -810,7 +810,7 @@ void LLGAnalysis::RunEventLoop( int nEntriesMax ) {
     }
 
 	passedLogFile.open("Regions.log",ios::app);
-	passedLogFile<<datasetName<<"    "<<RegionA<<"    "<<RegionB<<"    "<<RegionC<<"    "<<RegionD<<"    "<<RegionAWeighted<<"    "<<RegionBWeighted<<"    "<<RegionCWeighted<<"    "<<RegionDWeighted<<endl;
+	passedLogFile<<datasetName<<"\t"<<RegionA<<"\t"<<RegionB<<"\t"<<RegionC<<"\t"<<RegionD<<"\t"<<RegionAWeighted<<"\t"<<RegionBWeighted<<"\t"<<RegionCWeighted<<"\t"<<RegionDWeighted<<"\t"<<sqrt(RegionAError)<<"\t"<<sqrt(RegionBError)<<"\t"<<sqrt(RegionCError)<<"\t"<<sqrt(RegionDError)<<endl;
 
   return;
 }

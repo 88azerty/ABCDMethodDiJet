@@ -6,12 +6,16 @@ void LLGAnalysis::SetupABCDDijet() {
 	_cutFlow.insert(pair<string,int>("1_MET", 0 ) );
 	RegionA=0;
 	RegionAWeighted=0;
+	RegionAError=0;
 	RegionB=0;
 	RegionBWeighted=0;
+	RegionBError=0;
 	RegionC=0;
 	RegionCWeighted=0;
+	RegionCError=0;
 	RegionD=0;
 	RegionDWeighted=0;
+	RegionDError=0;
 
 	makeHist( "mJJSV", 100, 0., 500., "DiJet mass at SV", "Number of Jet Pairs" );
 
@@ -144,17 +148,21 @@ void LLGAnalysis::ABCDDijetSelection() {
 			if ( leadingVertexPt <150 ) {
 				RegionA++;
 				RegionAWeighted+=evtWeight;
+				RegionAError+=evtWeight^2;
 			} else {
 				RegionD++;
 				RegionDWeighted+=evtWeight;
+				RegionDError+=evtWeight^2;
 			}
 		} else {
 			if ( leadingVertexPt<150 ) {
 				RegionB++;
 				RegionBWeighted+=evtWeight;
+				RegionBError+=evtWeight^2;
 			} else {
 				RegionC++;
 				RegionCWeighted+=evtWeight;
+				RegionCError+=evtWeight^2;
 			}
 		}
 	}
