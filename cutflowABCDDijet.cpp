@@ -3,9 +3,9 @@
 void LLGAnalysis::SetupABCDDijet() {
 
 	_cutFlow.insert(pair<string,int>("0_NoCut", 0 ) );
-	// _cutFlow.insert(pair<string,int>("1_MET", 0 ) );
-	// _cutFlow.insert(pair<string,int>("2_MuonVeto", 0) );
-	// _cutFlow.insert(pair<string,int>("3_ElectronVeto", 0) );
+	_cutFlow.insert(pair<string,int>("1_MET", 0 ) );
+	_cutFlow.insert(pair<string,int>("2_MuonVeto", 0) );
+	_cutFlow.insert(pair<string,int>("3_ElectronVeto", 0) );
 	RegionA=0;
 	RegionAWeighted=0;
 	RegionAError=0;
@@ -28,16 +28,16 @@ void LLGAnalysis::SetupABCDDijet() {
 
 void LLGAnalysis::ABCDDijetSelection() {
 	_cutFlow.at("0_NoCut") += 1;
-	// if (sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET)) < MET_CUT ) {
-	// 	return;
-	// }
-	// _cutFlow.at("1_MET") += 1;
-	//
-  // if( vetoMuons.size() > 0 ) return;
-  // _cutFlow.at("2_MuonVeto") += 1;
-	//
-  // if( vetoElectrons.size() > 0 ) return;
-  // _cutFlow.at("3_ElectronVeto") += 1;
+	if (sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET)) < MET_CUT ) {
+		return;
+	}
+	_cutFlow.at("1_MET") += 1;
+
+  if( vetoMuons.size() > 0 ) return;
+  _cutFlow.at("2_MuonVeto") += 1;
+
+  if( vetoElectrons.size() > 0 ) return;
+  _cutFlow.at("3_ElectronVeto") += 1;
 
 	int leadingPV = -1;
 	double leadingVertexPt = 0.;
