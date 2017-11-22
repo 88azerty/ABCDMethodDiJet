@@ -79,8 +79,8 @@ void LLGAnalysis::ABCDDijetSelection() {
 			}
 		}
 
-		_histograms1D.at("PVJet1Pt").Fill( ptLeadingJetPV, evtWeight );
-		_histograms1D.at("PVJet1PtNW").Fill( ptLeadingJetPV, 1 );
+		_histograms1D.at("PVJet1Pt").Fill( leadingVertexPt, evtWeight );
+		_histograms1D.at("PVJet1PtNW").Fill( leadingVertexPt, 1 );
 
 		for( unsigned int iVtx = 0; iVtx < secVertex_x->size(); ++iVtx ) {
 			if( fabs(position.at(0) - secVertex_x->at(iVtx) ) < 1.e-10 &&
