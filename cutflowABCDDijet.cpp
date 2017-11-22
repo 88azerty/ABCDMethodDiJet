@@ -19,6 +19,8 @@ void LLGAnalysis::SetupABCDDijet() {
 	RegionDWeighted=0;
 	RegionDError=0;
 
+	makeHist( "PVJet1Pt", 50, 0., 1000., "PV Leading Jet pT [GeV]", "Number of Events" );
+	makeHist( "PVJet1PtNW", 50, 0., 1000., "PV Leading Jet pT [GeV] (non-weighted)", "Number of Events" );
 	makeHist( "mJJSV", 100, 0., 500., "DiJet mass at SV", "Number of Jet Pairs" );
 
 	return;
@@ -77,6 +79,9 @@ void LLGAnalysis::ABCDDijetSelection() {
 			}
 		}
 
+		_histograms1D.at("PVJet1Pt").Fill( ptLeadingJetPV, evtWeight );
+		_histograms1D.at("PVJet1PtNW").Fill( ptLeadingJetPV, 1 );
+
 		for( unsigned int iVtx = 0; iVtx < secVertex_x->size(); ++iVtx ) {
 			if( fabs(position.at(0) - secVertex_x->at(iVtx) ) < 1.e-10 &&
 			fabs(position.at(1) - secVertex_y->at(iVtx) ) < 1.e-10 &&
@@ -105,13 +110,13 @@ void LLGAnalysis::ABCDDijetSelection() {
 
 	for (unsigned int iSV = 0; iSV < secVertex_x->size(); iSV++) {
 		if ( idJetsToSV.at(iSV).size() <= 1 ){
-			if ( leadingVertexPt<150 ) {
-				RegionA++;
-				RegionAWeighted+=evtWeight;
-			} else {
-				RegionD++;
-				RegionDWeighted+=evtWeight;
-			}
+			// if ( leadingVertexPt<150 ) {			//ignore vertices with fewer than 2 jets.
+			// 	RegionA++;
+			// 	RegionAWeighted+=evtWeight;
+			// } else {
+			// 	RegionD++;
+			// 	RegionDWeighted+=evtWeight;
+			// }
 			continue; //skip if vertex has fewer than 2 jets
 		}
 		for( unsigned int iJToSV = 0; iJToSV < idJetsToSV.at(iSV).size(); ++iJToSV ) {
