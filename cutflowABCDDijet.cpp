@@ -22,7 +22,7 @@ void LLGAnalysis::SetupABCDDijet() {
 	makeHist( "PVJet1Pt", 50, 0., 1000., "PV Leading Jet pT [GeV]", "Number of Events" );
 	makeHist( "PVJet1PtNW", 50, 0., 1000., "PV Leading Jet pT [GeV] (non-weighted)", "Number of Events" );
 	makeHist( "mJJSV", 100, 0., 500., "DiJet mass at SV", "Number of Jet Pairs" );
-	makeHist( "MET", 100,0.,0., "Missing Transverse Energy", "Number of Events");
+	makeHist( "MET", 100,0.,500., "Missing Transverse Energy", "Number of Events");
 
 	return;
 }
