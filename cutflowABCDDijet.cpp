@@ -22,13 +22,15 @@ void LLGAnalysis::SetupABCDDijet() {
 	makeHist( "PVJet1Pt", 50, 0., 1000., "PV Leading Jet pT [GeV]", "Number of Events" );
 	makeHist( "PVJet1PtNW", 50, 0., 1000., "PV Leading Jet pT [GeV] (non-weighted)", "Number of Events" );
 	makeHist( "mJJSV", 100, 0., 500., "DiJet mass at SV", "Number of Jet Pairs" );
+	makeHist( "MET", 100,0.,0., "Missing Transverse Energy", "Number of Events");
 
 	return;
 }
 
 void LLGAnalysis::ABCDDijetSelection() {
 	_cutFlow.at("0_NoCut") += 1;
-	if (sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET)) < MET_CUT ) {
+	double METProper = sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET));
+	if ( METProper < MET_CUT ) {
 		return;
 	}
 	_cutFlow.at("1_MET") += 1;
@@ -157,6 +159,7 @@ void LLGAnalysis::ABCDDijetSelection() {
 		p4Jet2.SetPtEtaPhiM( recoJet_pt->at(idxSubLeadingJet).at(SYSJET), recoJet_eta->at(idxSubLeadingJet), recoJet_phi->at(idxSubLeadingJet), 0. );
 		TLorentzVector p4DiJet = p4Jet1 + p4Jet2;
 		_histograms1D.at("mJJSV").Fill( p4DiJet.M(), evtWeight );
+		_histograms1D.at("MET").Fill(METProper, evtWeight);
 
 		if ( p4DiJet.M() <60 ) {
 			if ( leadingVertexPt <150 ) {
