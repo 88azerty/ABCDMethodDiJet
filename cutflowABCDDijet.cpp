@@ -30,19 +30,18 @@ void LLGAnalysis::SetupABCDDijet() {
 void LLGAnalysis::ABCDDijetSelection() {
 	_cutFlow.at("0_NoCut") += 1;
 	double METProper = sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET));
-	if ( cutSwitch == 1 ){
-		if ( METProper < MET_CUT ) {
-			return;
-		}
-		_cutFlow.at("1_MET") += 1;
 
-		if( vetoMuons.size() > 0 ) return;
-		_cutFlow.at("2_MuonVeto") += 1;
+	//CUTS
+	if ( METProper < MET_CUT && cutSwitch == 1) return;
+	_cutFlow.at("1_MET") += 1;
 
-		if( vetoElectrons.size() > 0 ) return;
-		_cutFlow.at("3_ElectronVeto") += 1;
-	}
+	if( vetoMuons.size() > 0 && cutSwitch == 1) return;
+	_cutFlow.at("2_MuonVeto") += 1;
 
+	if( vetoElectrons.size() > 0 && cutSwitch == 1) return;
+	_cutFlow.at("3_ElectronVeto") += 1;
+	//CUTS
+	
 	int leadingPV = -1;
 	double leadingVertexPt = 0.;
 	//assign jets to vertices
