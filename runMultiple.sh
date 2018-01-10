@@ -6,7 +6,7 @@ for i in "${arr[@]}"
 do
     echo "InputFile /eos/user/c/chensel/Work/Analysis/LongLivedGluinos/MC/2015/Matthias/LLGDVFiles_Spring15/76_v1/QCD_Pt_${i}/QCD_Pt_${i}.root" >> ConfigSync2.txt
     echo "DatasetName QCD_Pt_${i}_TuneCUETP8M1_13TeV_pythia8" >> ConfigSync2.txt
-    echo -e "\e[32mNow Running \e[1m${i}\e[0m \n"
+    echo -e "\n\e[32mNow Running \e[1m${i}\e[0m"
     ./RunAnalysis ConfigSync2.txt
     mv outputHistograms.root ${i}_histos.root
     head -n -2 ConfigSync2.txt > temp.txt ; mv temp.txt ConfigSync2.txt
