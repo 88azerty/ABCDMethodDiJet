@@ -11,6 +11,6 @@ do
     echo -e "\n\e[31mNow Running runMultiple with \e[1m  H${j}V${i}  \e[0m"
     ./runMultiple.sh
     mv sumhistos.root sumhistosH${j}V${i}.root
-    mv regions.log regionsH${j}V${i}.log
+    mv Regions.log RegionsH${j}V${i}.log
   done
 done
