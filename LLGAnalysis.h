@@ -278,6 +278,9 @@ class LLGAnalysis {
         double lumiWeight;
         double pileupWeight;
         string GenFileName;
+        float verticalBoundary;
+        float horizontalBoundary;
+        int cutSwitch;
 
 
         TFile *fTruth;

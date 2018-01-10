@@ -3,3 +3,6 @@ Selection       ABCDDijet
 MET_CUT         300
 ApplyEventWeights	1
 ApplyPileupWeights	0
+cutSwitch           0
+verticalBoundary    60
+horizontalBoundary  150

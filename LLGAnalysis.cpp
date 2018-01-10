@@ -70,6 +70,9 @@ LLGAnalysis::LLGAnalysis( char *configFileName ) {
         if( key == "GenFileName"        )   GenFileName = value;
         if( key == "SystUncert"         )   RUNSYS = value;
         if( key == "GENLEVEL_HT_CUT"    )   GENLEVEL_HT_CUT = atof(value.c_str());
+        if( key == "horizontalBoundary" )   horizontalBoundary = atof(value.c_str());
+        if( key == "verticalBoundary"   )   verticalBoundary = atof(value.c_str());
+        if( key == "cutSwitch"          )   cutSwitch = atoi(value.c_str());
     }
 
     if( RUNSYS == "JECUP"   ) { SYSJET = 1; SYSMET = 3; }

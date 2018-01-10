@@ -30,16 +30,18 @@ void LLGAnalysis::SetupABCDDijet() {
 void LLGAnalysis::ABCDDijetSelection() {
 	_cutFlow.at("0_NoCut") += 1;
 	double METProper = sqrt(met_x->at(SYSMET) * met_x->at(SYSMET) + met_y->at(SYSMET) * met_y->at(SYSMET));
-	if ( METProper < MET_CUT ) {
-		return;
+	if ( cutSwitch == 1 ){
+		if ( METProper < MET_CUT ) {
+			return;
+		}
+		_cutFlow.at("1_MET") += 1;
+
+		if( vetoMuons.size() > 0 ) return;
+		_cutFlow.at("2_MuonVeto") += 1;
+
+		if( vetoElectrons.size() > 0 ) return;
+		_cutFlow.at("3_ElectronVeto") += 1;
 	}
-	_cutFlow.at("1_MET") += 1;
-
-  if( vetoMuons.size() > 0 ) return;
-  _cutFlow.at("2_MuonVeto") += 1;
-
-  if( vetoElectrons.size() > 0 ) return;
-  _cutFlow.at("3_ElectronVeto") += 1;
 
 	int leadingPV = -1;
 	double leadingVertexPt = 0.;
@@ -161,8 +163,8 @@ void LLGAnalysis::ABCDDijetSelection() {
 		_histograms1D.at("mJJSV").Fill( p4DiJet.M(), evtWeight );
 		_histograms1D.at("MET").Fill(METProper, evtWeight);
 
-		if ( p4DiJet.M() <60 ) {
-			if ( leadingVertexPt <150 ) {
+		if ( p4DiJet.M() < verticalBoundary ) {
+			if ( leadingVertexPt < horizontalBoundary ) {
 				RegionA++;
 				RegionAWeighted+=evtWeight;
 				RegionAError+=evtWeight*evtWeight;
@@ -172,7 +174,7 @@ void LLGAnalysis::ABCDDijetSelection() {
 				RegionDError+=evtWeight*evtWeight;
 			}
 		} else {
-			if ( leadingVertexPt<150 ) {
+			if ( leadingVertexPt < horizontalBoundary) {
 				RegionB++;
 				RegionBWeighted+=evtWeight;
 				RegionBError+=evtWeight*evtWeight;
