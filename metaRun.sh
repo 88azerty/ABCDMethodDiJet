@@ -2,7 +2,7 @@
 
 declare -a arrayV=( "60" )
 declare -a arrayH=( "130" "140" "150" "160" "170" )
-echo "Boundaries\tRegionA\tRegionB\RegionC\tRegionD\RegionAW\tRegionBW\RegionCW\tRegionDW" > Total.tsv
+echo -e "Boundaries\tRegionA\tRegionB\RegionC\tRegionD\RegionAW\tRegionBW\RegionCW\tRegionDW" > Total.tsv
 for i in "${arrayV[@]}"
 do
   sed -i "s/verticalBoundary.*/verticalBoundary ${i}/g" ConfigSync2.txt
