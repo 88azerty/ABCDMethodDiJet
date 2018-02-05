@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Analyse data from RegionsHV.log files for complete analysis.')
 parser.add_argument('-i', '--inputfile',   help='Input File (required).',  required = True, type = argparse.FileType('r'))
-parser.add_argument('-o', '--outputfile',  help='Output File (required).', required = True, type = argparse.FileType('w'))
+parser.add_argument('-o', '--outputfile',  help='Output File (required).', required = True, type = argparse.FileType('a'))
 parser.add_argument('-H', '--horizontal',   help='Position of horizontal boundary.', required = True, type = float)
 parser.add_argument('-V', '--vertical',   help='Position of vertical boundary.', required = True, type = float)
 args=parser.parse_args()
@@ -52,8 +52,8 @@ RegionDW = sum( columnDW )
 
 with args.outputfile as g:
 	#   g.write('Boundaries' + '\t' + 'RegionA' + '\t' + 'RegionB'+ '\t' + 'RegionC'+ '\t' + 'RegionD'+ '\t' + 'RegionAW' + '\t' + 'RegionBW' + '\t' + 'RegionCW' + '\t' + 'RegionDW')
-	g.seek(0, 2)
-	g.write(        'H' + str(args.horizontal) + 'V' + str(args.vertical) + '\t' +
+	#g.seek(0, 2)
+	g.write( 'H' + str(int(args.horizontal)) + 'V' + str(int(args.vertical)) + '\t' +
 	str(RegionA) + '\t' +
 	str(RegionB) + '\t' +
 	str(RegionC) + '\t' +
@@ -61,5 +61,5 @@ with args.outputfile as g:
 	str(RegionAW) + '\t' +
 	str(RegionBW) + '\t' +
 	str(RegionCW) + '\t' +
-	str(RegionDW) + '\t'
+	str(RegionDW) + '\n'
 	)
